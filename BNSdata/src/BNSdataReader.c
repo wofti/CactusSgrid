@@ -403,6 +403,8 @@ void BNSdataPars(CCTK_ARGUMENTS)
   double ret;
   int i, j, count, start; 
 
+  CCTK_INFO ("BNSdataPars: Reading pars for BNS initial data");
+
   /* get BNSdataReader_sgrid_datadir and remove any trailing / */
   //snprintf(datadir, STRLEN-1, "%s", Gets("BNSdataReader_sgrid_datadir"));
   snprintf(datadir, STRLEN-1, "%s", sgrid_datadir);
@@ -456,7 +458,8 @@ void BNSdataPars(CCTK_ARGUMENTS)
 
   if(BNS_EoS_n_pieces == 1)
   {
-    printf("rho0_list %s  ->  single polytrope\n", strrho0);
+    printf("Only 1 entry in n_list  ->  single polytrope\n");
+    printf("rho0_list %s\n", strrho0);
   }
   else
   {
