@@ -137,7 +137,7 @@ void BNSdataReader(CCTK_ARGUMENTS)
   if(!use_interpolator)
   {
     /* If you want to use previously generated ID use these two lines
-       Set BNSdataReader_IDfiles_dir to the dir where you put the "ID*.dat"
+       Set IDfiles_dir to the dir where you put the "ID*.dat"
        files generated in a previous run */
     sprintf(IDfile, "%s/ID_level_%d_proc_%d.dat", IDfiles_dir, level_l, MPIrank);
     printf("Looking for file %s\n", IDfile);
@@ -147,8 +147,22 @@ void BNSdataReader(CCTK_ARGUMENTS)
     if(fp2==NULL)
     {
       printf("Cannot open %s\n", IDfile);
-      printf("Will call interpolator.\n");
-      use_interpolator = 1;
+      /* check if other IDfile exists */
+      sprintf(IDfile, "%s/ID_level_%d_proc_%d.dat", out_dir, level_l, MPIrank);
+      fp2 = fopen(IDfile, "rb");
+      if(fp2==NULL)
+      {
+        printf("Cannot open %s\n", IDfile);
+        printf("Will call interpolator.\n");
+        use_interpolator = 1;
+      }
+      else
+      {
+        printf("%s exists, no need to call interpolator.\n", IDfile);
+        use_interpolator = 0;
+        //copy_IDfile_from_previous = 1; /* copy it to current outdir later */
+        fclose(fp2);
+      }
     }
     else
     {
