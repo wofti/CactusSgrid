@@ -1,0 +1,14 @@
+# Interface definition for thorn BNSdata
+
+IMPLEMENTS: BNSdata
+
+INHERITS: grid SummationByParts ADMBase HydroBase
+
+
+#
+#SUBROUTINE Diff_gv (CCTK_POINTER_TO_CONST IN cctkGH, \
+#                    CCTK_INT IN dir, \
+#                    CCTK_REAL IN ARRAY var, \
+#                    CCTK_REAL OUT ARRAY dvar, \
+#                    CCTK_INT IN table_handle)
+#USES FUNCTION Diff_gv
