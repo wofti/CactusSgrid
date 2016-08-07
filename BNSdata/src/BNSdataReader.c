@@ -399,8 +399,31 @@ void BNSdataReader(CCTK_ARGUMENTS)
              detg, i, x[i], y[i], z[i]);
        //errorexit("found a point with det(g_ij)<=0.");
     }
+  } /* end of all points loop */
 
+  /* set time derivs of lapse and shift if desired */
+  {
+    if(CCTK_EQUALS(initial_lapse, "BNSdata"))
+    {
+      if(CCTK_EQUALS (initial_dtlapse, "BNSdata"))
+      {
+        CCTK_INFO("Setting time derivatives of lapse");
+        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, alp, dtalp, Omega);
+      }
+    }
+
+    if(CCTK_EQUALS(initial_shift, "BNSdata"))
+    {
+      if(CCTK_EQUALS(initial_dtshift, "BNSdata"))
+      {
+        CCTK_INFO("Setting time derivatives of shift");
+        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betax, dtbetax, Omega);
+        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betay, dtbetay, Omega);
+        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betaz, dtbetaz, Omega);
+      }
+    }
   }
+
   /* increase level_l counter */
   level_l++;
 }
@@ -559,7 +582,7 @@ void BNSdataPars(CCTK_ARGUMENTS)
   printf("sgrid_x_CM = %g\n", sgrid_x_CM);
 
   /* Here we could set some carpet pars that control the grid: */
-  /* set some pars relevant for setting up bam's grid */
+  ///* set some pars relevant for setting up bam's grid */
   //printf("Setting some pars relevant for setting up bam's grid:\n");
   //Setd("mass1", m01);
   //Setd("mass2", m02);
@@ -586,4 +609,38 @@ void BNS_select_polytrope_n_kappa_k_of_hm1(double hm1,
   *n     = BNS_EoS_n[m];
   *kappa = BNS_EoS_kappa[m];
   *k     = BNS_EoS_k[m];
+}
+
+
+/* Calculate the time deriv of a grid var in the inertial frame from it's
+   spatial derivs assuming a helical Killing vector.
+   The way it's done below should work for scalars. */
+void set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
+                                              CCTK_REAL *var, CCTK_REAL *dtvar,
+                                              CCTK_REAL Omega)
+{
+  DECLARE_CCTK_ARGUMENTS;
+  int i;
+  int const npoints = cctk_lsh[0] * cctk_lsh[1] * cctk_lsh[2];
+  CCTK_REAL *dxvar;
+  CCTK_REAL *dyvar;
+
+  /* alloc space for x and y deriv of var */
+  dxvar = calloc(npoints, sizeof(CCTK_REAL));
+  dyvar = calloc(npoints, sizeof(CCTK_REAL));
+
+  /* get x and y deriv of var */
+  Diff_gv(cctkGH, 0, var, dxvar, -1);
+  Diff_gv(cctkGH, 1, var, dyvar, -1);
+
+  for(i=0; i<npoints; ++i)
+  {
+    CCTK_REAL ephix = -y[i];
+    CCTK_REAL ephiy = +x[i];
+    CCTK_REAL dphi_var = ephix * dxvar[i] + ephiy * dyvar[i];
+    dtvar[i] = -Omega * dphi_var;
+  }
+  /* free derivs */
+  free(dyvar);
+  free(dxvar);
 }
