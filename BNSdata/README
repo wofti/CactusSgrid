@@ -6,4 +6,28 @@ Licence      : GPL
 
 1. Purpose
 
-Import sgrid BNSdata binary neutron star initial data.
+Import Sgrid's BNSdata, which is binary neutron star initial data.
+
+
+2. How it works
+
+In order to interpolate Sgrid's BNSdata onto the grid of Cactus, we need
+an Sgrid executable, and Sgrid data. The location of the executable and
+the data are set by the pars BNSdata::sgrid_exe and BNSdata::sgrid_datadir
+in the Cactus par file. E.g.:
+BNSdata::sgrid_exe = "/home/wolf/sgrid/exe/sgrid"
+BNSdata::sgrid_datadir = "K123m01.625b12.1irr5dsp0_new_24"
+
+One also needs to specify things like:
+ActiveThorns = "BNSdata"
+HydroBase::initial_hydro         = "BNSdata"
+ADMBase::initial_data            = "BNSdata"
+ADMBase::initial_lapse           = "BNSdata"
+ADMBase::initial_shift           = "zero"
+ADMBase::initial_dtlapse         = "BNSdata"
+ADMBase::initial_dtshift         = "zero"
+
+When Cactus starts, each MPI process will start an Sgrid executable,
+which in turn will interplate data on Cactus' grid, reading data from
+BNSdata::sgrid_datadir. Communication between Sgrid and Cactus is achieved
+via files written into out_dir.
