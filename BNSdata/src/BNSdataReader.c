@@ -249,7 +249,7 @@ void BNSdataReader(CCTK_ARGUMENTS)
       // FIXME: need CCTK function that returns number of last level
       if(1) //(level_l == grid->lmax)
       {
-        printf("FIXME: need CCTK function that returns number of last level");
+        printf("FIXME: need CCTK function that returns number of last level\n");
       
         printf("Ok I stop here. Sombody has to run sgrid to make ID files "
                "for each proc.\n\n");
@@ -258,9 +258,11 @@ void BNSdataReader(CCTK_ARGUMENTS)
         printf("OR compile sgrid with MPI and run it as:\n");
         printf("%s --argsfile %s\n\n", sgrid_exe, sgridallargsfile);
         fflush(stdout);
-        MPI_Finalize();
-        exit(0);
+        // FIXME: the code should stop here on all proc!!!
+        //MPI_Finalize();
+        //exit(0);
       }
+      return ret;
     }
     /* move IDfile_new to IDfile */
     rename(IDfile_new, IDfile);
