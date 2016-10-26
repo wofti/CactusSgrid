@@ -214,6 +214,8 @@ void BNSdataReader(CCTK_ARGUMENTS)
     printf("System call:\n%s\n", call_interpolator);
     fflush(stdout);
     ret = system(call_interpolator);
+    printf("System call returned: %d\n", ret);
+    fflush(stdout);
     /* ret = system_emu(call_interpolator); */
     if(ret)
     {
@@ -233,24 +235,21 @@ void BNSdataReader(CCTK_ARGUMENTS)
       fprintf(fp1, "%s%s", sgridargs, "\n");
       fclose(fp1);
       /* write all args from this proc in a 2nd common file */
-      for(i = 0; i < MPIsize; i++)  /* for all processes */
-      {
-        if(i == MPIrank) /* if it is my turn */
-        {
-          sprintf(sgridallargsfile, "%s/sgridargs_allproc.txt", out_dir);
-          fp1 = fopen(sgridallargsfile, "a");
-          if(fp1==NULL) errorexits("could not open %s", sgridallargsfile);
-          fprintf(fp1, "%s%s", sgridargs, "\n");
-          fclose(fp1);
-        }
-        /* everyone please wait here */
-        MPI_Barrier(MPI_COMM_WORLD);
-      }
+      sprintf(sgridallargsfile, "%s/sgridargs_allproc.txt", out_dir);
+      fp1 = fopen(sgridallargsfile, "a");
+      if(fp1==NULL) errorexits("could not open %s", sgridallargsfile);
+      if(lock_curr_til_EOF(fp1)!=0)
+        printf("Could not lock file %s on proc %d\n",
+               sgridallargsfile, MPIrank);
+      fprintf(fp1, "%s%s", sgridargs, "\n");
+      fclose(fp1);
       /* errorexit("interpolator returned non-zero exit code!"); */
       printf("interpolator returned non-zero exit code: %d\n", ret);
+      fflush(stdout);
+      // FIXME: need CCTK function that returns number of last level
       if(1) //(level_l == grid->lmax)
       {
-        errorexit("we need to find a cactus func that returns last level num.");
+        printf("FIXME: need CCTK function that returns number of last level");
       
         printf("Ok I stop here. Sombody has to run sgrid to make ID files "
                "for each proc.\n\n");
@@ -258,6 +257,7 @@ void BNSdataReader(CCTK_ARGUMENTS)
         printf("%s --argsfile %s\n\n", sgrid_exe, sgridargsfile);
         printf("OR compile sgrid with MPI and run it as:\n");
         printf("%s --argsfile %s\n\n", sgrid_exe, sgridallargsfile);
+        fflush(stdout);
         MPI_Finalize();
         exit(0);
       }

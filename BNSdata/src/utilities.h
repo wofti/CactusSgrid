@@ -52,6 +52,8 @@ int copy_file_into_dir(char *fname, char *dir);
 int system2(char *s1, char *s2);
 int system3(char *s1, char *s2, char *s3);
 int system_emu(const char *command);
+int lock_curr_til_EOF(FILE *out);
+int unlock_curr_til_EOF(FILE *out);
 int construct_argv(char *str, char ***argv);
 double *dmalloc(int n);
 int *imalloc(int n);
