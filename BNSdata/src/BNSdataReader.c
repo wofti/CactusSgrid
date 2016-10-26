@@ -214,9 +214,9 @@ void BNSdataReader(CCTK_ARGUMENTS)
     printf("System call:\n%s\n", call_interpolator);
     fflush(stdout);
     ret = system(call_interpolator);
+    /* ret = system_emu(call_interpolator); */
     printf("System call returned: %d\n", ret);
     fflush(stdout);
-    /* ret = system_emu(call_interpolator); */
     if(ret)
     {
       char sgridargsfile[STRLEN];
