@@ -213,8 +213,8 @@ void BNSdataReader(CCTK_ARGUMENTS)
       strcat(call_interpolator, " > /dev/null");
     printf("System call:\n%s\n", call_interpolator);
     fflush(stdout);
-    ret = system(call_interpolator);
-    /* ret = system_emu(call_interpolator); */
+    /* ret = system(call_interpolator); */
+    ret = system_emu(call_interpolator);
     printf("System call returned: %d\n", ret);
     fflush(stdout);
     if(ret)
@@ -262,7 +262,7 @@ void BNSdataReader(CCTK_ARGUMENTS)
         //MPI_Finalize();
         //exit(0);
       }
-      return ret;
+      return;
     }
     /* move IDfile_new to IDfile */
     rename(IDfile_new, IDfile);
