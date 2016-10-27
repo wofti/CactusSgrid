@@ -211,7 +211,7 @@ void BNSdataReader(CCTK_ARGUMENTS)
       strcat(call_interpolator, " --modify-par:BNSdata_Interpolate_make_finer_grid2_forXYZguess=no");
     if(!keep_sgrid_output)
       strcat(call_interpolator, " > /dev/null");
-    printf("System call:\n%s\n", call_interpolator);
+    printf("System call:\n"); // %s\n", call_interpolator);
     fflush(stdout);
     /* ret = system(call_interpolator); */
     ret = system_emu(call_interpolator);
