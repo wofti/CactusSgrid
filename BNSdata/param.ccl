@@ -45,7 +45,7 @@ PRIVATE:
 
 # parameters also used in bam's BNSdataReader
   
-STRING sgrid_exe "location of sgrid executable"
+STRING sgrid_exe "location of sgrid executable" STEERABLE=ALWAYS
 {
   "" :: ""
 } "./sgrid"
