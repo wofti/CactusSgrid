@@ -68,6 +68,8 @@ void BNSdataReader(CCTK_ARGUMENTS)
   CCTK_REAL *matter_vx = vel;
   CCTK_REAL *matter_vy = vel + npoints;
   CCTK_REAL *matter_vz = vel + npoints*2;
+  /* DR: backup the original value of lapse and shift here */
+  CCTK_REAL *alp_def, *betax_def, *betay_def, *betaz_def;
   int MPIrank, MPIsize;
   int pr=0;
   int i, j, n;
@@ -85,6 +87,32 @@ void BNSdataReader(CCTK_ARGUMENTS)
   int ret;
   double s180 = (1 - 2*rotation180);
   int use_interpolator = use_Interpolator;
+
+  /* which variables to set */
+  int set_lapse = CCTK_EQUALS(initial_lapse, "BNSdata");
+  int set_dtlapse = CCTK_EQUALS(initial_dtlapse, "BNSdata");
+  int set_shift = CCTK_EQUALS(initial_shift, "BNSdata");
+  int set_dtshift = CCTK_EQUALS(initial_dtshift, "BNSdata");
+  int set_hydro = CCTK_EQUALS(initial_hydro, "BNSdata");
+
+  /* backup lapse and shift if needed */
+  {
+    if(!set_lapse)
+    {
+      alp_def = malloc(npoints*sizeof(*alp_def));
+      memcpy(alp_def, alp, npoints*sizeof(*alp_def));
+    }
+
+    if(!set_shift)
+    {
+      betax_def = malloc(npoints*sizeof(*betax_def));
+      betay_def = malloc(npoints*sizeof(*betay_def));
+      betaz_def = malloc(npoints*sizeof(*betaz_def));
+      memcpy(betax_def, betax, npoints*sizeof(*betax_def));
+      memcpy(betay_def, betay, npoints*sizeof(*betay_def));
+      memcpy(betaz_def, betaz, npoints*sizeof(*betaz_def));
+    }
+  }
 
   /* get refinement level number and MPI rank and size */
   level_l = ilogb(cctk_levfac[0]);
@@ -334,40 +362,43 @@ void BNSdataReader(CCTK_ARGUMENTS)
     VRy *= s180;
 
     /* convert q, VR to rho, press, eps, matter_vx */
-    if(q>0.0)
+    if(set_hydro)
     {
-      double vIx,vIy,vIz;
-      double xix,xiy,xiz;
-      double BNS_n, BNS_kappa, BNS_k, hmk;
+      if(q>0.0)
+      {
+        double vIx,vIy,vIz;
+        double xix,xiy,xiz;
+        double BNS_n, BNS_kappa, BNS_k, hmk;
 
-      BNS_select_polytrope_n_kappa_k_of_hm1(q, &BNS_n, &BNS_kappa, &BNS_k);
-      hmk = q + (1.0 - BNS_k);  /* hmk = hm1 + 1 - k , hm1 = q*/   
-      rho[i] = pow(hmk/(BNS_kappa*(BNS_n+1.0)), BNS_n);
-      press[i]   = rho[i] * hmk/((BNS_n)+1.0);
-      eps[i]= q - press[i]/rho[i];
-      // printf("q %e r %e q %e eps %e n %e kappa %e k %e\n", q, rho[i],press[i],eps[i],BNS_n, BNS_kappa, BNS_k);
+        BNS_select_polytrope_n_kappa_k_of_hm1(q, &BNS_n, &BNS_kappa, &BNS_k);
+        hmk = q + (1.0 - BNS_k);  /* hmk = hm1 + 1 - k , hm1 = q*/
+        rho[i] = pow(hmk/(BNS_kappa*(BNS_n+1.0)), BNS_n);
+        press[i]   = rho[i] * hmk/((BNS_n)+1.0);
+        eps[i]= q - press[i]/rho[i];
+        // printf("q %e r %e q %e eps %e n %e kappa %e k %e\n", q, rho[i],press[i],eps[i],BNS_n, BNS_kappa, BNS_k);
 
-      xb = x[i] * s180; /* in case there is 180 deg. rot. */
-      xmax = (xb>0)?xmax1:xmax2;
-      /* construct KV xi from Omega, ecc, rdot, xmax1-xmax2 */
-      xix = -Omega*y[i] + x[i]*rdotor; /* CM is at (0,0,0) in bam */
-      xiy =  Omega*(x[i] - ecc*xmax) + y[i]*rdotor; 
-      xiz = z[i]*rdotor;
-      /* vI^i = VR^i + xi^i */
-      vIx = VRx + xix;
-      vIy = VRy + xiy;
-      vIz = VRz + xiz;
-      /* Note: vI^i = u^i/u^0 in BNSdata, 
-               while matter_v^i = u^i/(alpha u^0) + beta^i / alpha
-         ==> matter_v^i = (vI^i + beta^i)/alpha                     */
-      matter_vx[i] = (vIx + betax[i])/alp[i];
-      matter_vy[i] = (vIy + betay[i])/alp[i];
-      matter_vz[i] = (vIz + betaz[i])/alp[i];
-    }
-    else
-    {
-      rho[i] = press[i] = eps[i] = 0.0;
-      matter_vx[i] = matter_vy[i] = matter_vz[i] = 0.0;
+        xb = x[i] * s180; /* in case there is 180 deg. rot. */
+        xmax = (xb>0)?xmax1:xmax2;
+        /* construct KV xi from Omega, ecc, rdot, xmax1-xmax2 */
+        xix = -Omega*y[i] + x[i]*rdotor; /* CM is at (0,0,0) in bam */
+        xiy =  Omega*(x[i] - ecc*xmax) + y[i]*rdotor;
+        xiz = z[i]*rdotor;
+        /* vI^i = VR^i + xi^i */
+        vIx = VRx + xix;
+        vIy = VRy + xiy;
+        vIz = VRz + xiz;
+        /* Note: vI^i = u^i/u^0 in BNSdata,
+                 while matter_v^i = u^i/(alpha u^0) + beta^i / alpha
+           ==> matter_v^i = (vI^i + beta^i)/alpha                     */
+        matter_vx[i] = (vIx + betax[i])/alp[i];
+        matter_vy[i] = (vIy + betay[i])/alp[i];
+        matter_vz[i] = (vIz + betaz[i])/alp[i];
+      }
+      else
+      {
+        rho[i] = press[i] = eps[i] = 0.0;
+        matter_vx[i] = matter_vy[i] = matter_vz[i] = 0.0;
+      }
     }
 
     /* print g_ij, K_ij, beta^i, alpha */
@@ -405,24 +436,35 @@ void BNSdataReader(CCTK_ARGUMENTS)
 
   /* set time derivs of lapse and shift if desired */
   {
-    if(CCTK_EQUALS(initial_lapse, "BNSdata"))
+    if(set_dtlapse)
     {
-      if(CCTK_EQUALS (initial_dtlapse, "BNSdata"))
-      {
-        CCTK_INFO("Setting time derivatives of lapse");
-        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, alp, dtalp, Omega);
-      }
+      CCTK_INFO("Setting time derivatives of lapse");
+      set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, alp, dtalp, Omega);
     }
 
-    if(CCTK_EQUALS(initial_shift, "BNSdata"))
+    if(set_dtshift)
     {
-      if(CCTK_EQUALS(initial_dtshift, "BNSdata"))
-      {
-        CCTK_INFO("Setting time derivatives of shift");
-        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betax, dtbetax, Omega);
-        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betay, dtbetay, Omega);
-        set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betaz, dtbetaz, Omega);
-      }
+      CCTK_INFO("Setting time derivatives of shift");
+      set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betax, dtbetax, Omega);
+      set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betay, dtbetay, Omega);
+      set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betaz, dtbetaz, Omega);
+    }
+  }
+
+  /* restore original lapse and shift if desired */
+  {
+    if(!set_lapse) {
+      memcpy(alp, alp_def, npoints*sizeof(*alp));
+      free(alp_def);
+    }
+
+    if(!set_shift) {
+      memcpy(betax, betax_def, npoints*sizeof(*betax));
+      memcpy(betay, betay_def, npoints*sizeof(*betay));
+      memcpy(betaz, betaz_def, npoints*sizeof(*betaz));
+      free(betax_def);
+      free(betay_def);
+      free(betaz_def);
     }
   }
 
