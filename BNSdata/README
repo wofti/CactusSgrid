@@ -28,6 +28,6 @@ ADMBase::initial_dtlapse         = "BNSdata"
 ADMBase::initial_dtshift         = "zero"
 
 When Cactus starts, each MPI process will start an Sgrid executable,
-which in turn will interplate data on Cactus' grid, reading data from
+which in turn will interpolate data on Cactus' grid, reading data from
 BNSdata::sgrid_datadir. Communication between Sgrid and Cactus is achieved
 via files written into out_dir.
