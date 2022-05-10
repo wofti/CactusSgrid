@@ -504,7 +504,7 @@ void BNSdataPars(CCTK_ARGUMENTS)
   if(fp1==NULL) errorexits("could not open %s", datadir);
 
   /* move fp1 to place where time = 0 is */
-  j=position_fileptr_after_str(fp1, "BNS data properties (time = 0):\n");
+  j=position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
   if(j==EOF) errorexits("could not find (time = 0) in %s", datadir);
 
   /* initialize pwp, set everything to default */  
