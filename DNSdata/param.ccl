@@ -1,0 +1,86 @@
+# Parameter definitions for thorn DNSdata
+
+SHARES: IO
+USES STRING out_dir
+
+
+SHARES: ADMBase
+
+EXTENDS KEYWORD initial_data
+{
+  "DNSdata" :: ""
+}
+
+EXTENDS KEYWORD initial_lapse
+{
+  "DNSdata" :: ""
+}
+
+EXTENDS KEYWORD initial_shift
+{
+  "DNSdata" :: ""
+}
+
+EXTENDS KEYWORD initial_dtlapse
+{
+  "DNSdata" :: ""
+}
+
+EXTENDS KEYWORD initial_dtshift
+{
+  "DNSdata" :: ""
+}
+
+
+
+SHARES: HydroBase
+
+EXTENDS KEYWORD initial_hydro
+{
+  "DNSdata" :: ""
+}
+
+
+PRIVATE:
+
+# parameters also used in bam's DNSdataReader
+  
+STRING sgrid_exe "location of sgrid executable" STEERABLE=ALWAYS
+{
+  "" :: ""
+} "./sgrid"
+
+STRING sgrid_datadir "location of sgrid outdir with data" STEERABLE=ALWAYS
+{
+  "" :: ""
+} ""
+
+BOOLEAN keep_sgrid_output "whether we keep the output sgrid creates while running [yes,no]"
+{
+} "no"
+
+BOOLEAN use_Interpolator "whether we use DNSdataReader_interpolator"
+{
+} "yes"
+
+BOOLEAN Interpolate_verbose "whether we print all points to stdout"
+{
+} "no"
+
+REAL Interpolate_max_xyz_diff "if positive we quit if x(X,Y,Z), y(X,Y,Z), z(X,Y,Z) differ by more than this from bam's x,y,x"
+{
+  : :: ""
+} -1.0
+
+BOOLEAN Interpolate_make_finer_grid2 "make finer grid2 to get a good guess for X,Y,Z [yes,no]"
+{
+} "yes"
+
+BOOLEAN rotation180 "rotate DNSdata by 180 degrees about z-axis [yes,no]"
+{
+} "no"
+
+STRING IDfiles_dir "Directory with ID .dat-files already interpolated to our current bam grid (needed if DNSdataReader_use_interpolator = no)"
+{
+  "" :: ""
+} ""
