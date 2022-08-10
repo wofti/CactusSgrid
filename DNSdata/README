@@ -1,0 +1,11 @@
+Cactus Code Thorn DNSdata
+Author(s)    : Wolfgang Tichy, Michal Pirog
+Maintainer(s): Wolfgang Tichy, Michal Pirog
+Licence      : GPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Import Sgrid's DNSdata, which is binary neutron star initial data.
+
+qqq
