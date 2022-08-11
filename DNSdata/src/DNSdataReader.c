@@ -7,6 +7,8 @@
 #include <math.h>
 #include <mpi.h>
 
+#include <sys/stat.h>
+
 /* include cactus stuff */
 #include <cctk.h>
 #include <cctk_Arguments.h>
@@ -86,6 +88,9 @@ void DNSdataReader(CCTK_ARGUMENTS)
   int ret;
   double s180 = (1 - 2*rotation180);
   int use_interpolator = use_Interpolator;
+
+  char command[10000];
+  int status = 0;
 
   /* which variables to set */
   int set_lapse = CCTK_EQUALS(initial_lapse, "DNSdata");
@@ -215,9 +220,12 @@ void DNSdataReader(CCTK_ARGUMENTS)
     printf("DNS_datareader: sgridoutdir = %s\n", sgridoutdir);
     printf("DNS_datareader: sgridcheckpoint_indir = %s\n", sgridcheckpoint_indir);
 
-    /* remove any old sgridoutdir and make a new one */
-    th_system2("rm -rf", sgridoutdir);
-    th_system2("mkdir", sgridoutdir);
+    th_remove_dir(sgridoutdir);
+    printf("DNS_datareader: Old directory deleted \n");
+
+    mkdir("mkdir", S_IRWXU | S_IRWXG);
+    printf("DNS_datareader: New directory created \n");
+
     fflush(stdout);
 
     /* call the interpolator that will generate the ID */
@@ -241,11 +249,9 @@ void DNSdataReader(CCTK_ARGUMENTS)
       strcat(call_interpolator, " --modify-par:BNSdata_Interpolate_make_finer_grid2_forXYZguess=no");
     if(!keep_sgrid_output)
       strcat(call_interpolator, " > /dev/null");
-    printf("DNS_datareader: System call:\n"); // %s\n", call_interpolator);
     fflush(stdout);
-    /* ret = system(call_interpolator); */
     ret = th_system_emu(call_interpolator);
-    printf("DNS_datareader: System call returned: %d\n", ret);
+    printf("DNS_datareader: th_system_emu returned: %d\n", ret);
     fflush(stdout);
     if(ret)
     {
@@ -298,9 +304,13 @@ void DNSdataReader(CCTK_ARGUMENTS)
     rename(IDfile_new, IDfile);
 
     /* clean up */
-    th_system2("rm -rf", sgridoutdir_previous);
+
+    th_remove_dir(sgridoutdir_previous);
+    printf("DNS_datareader: Cleaning up (part one) done \n");
     if(!keep_sgrid_output)
-    th_system2("rm -rf", sgridoutdir);
+    th_remove_dir(sgridoutdir);
+    printf("DNS_datareader: Cleaning up (part two) done \n");
+           
   }
   else
   {

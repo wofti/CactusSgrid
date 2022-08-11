@@ -61,53 +61,6 @@ int th_remove_dir(char *which_dir)
   return 0;
 }
 
-/* ugh, but how universal are those built in functions? */
-int th_system2(char *s1, char *s2) 
-{
-  return th_system3(s1, s2, "");
-}
-int th_system3(char *s1, char *s2, char *s3) 
-{
-  char command[10000];
-  int status = 0;
-
-  /* check for special cases where we can use c-functions */
-  if( strcmp(s1,"mv")==0 || strcmp(s1,"mv -f")==0 ) /* use rename */
-  {
-    sprintf(command, "rename(\"%s\", \"%s\");", s2, s3);
-    status = rename(s2, s3);
-    printf("DNS_utilities_th_system3: ANSI C call: %s\n", command);
-  }
-  else if( strcmp(s1,"rm -rf")==0 ) /* use remove */
-  {
-    if(strlen(s2)>0)
-    {
-      status = th_remove_dir(s2);
-      printf("DNS_utilities_th_system3: remove_dir(\"%s\");\n", s2);
-    }
-    if(strlen(s3)>0)
-    {
-      status = th_remove_dir(s3);
-      printf("DNS_utilities_th_system3: remove_dir(\"%s\");\n", s3);
-    }
-  }
-  else if( strcmp(s1,"mkdir")== 0 ) /* use POSIX.1-2001 mkdir function */
-  {
-    sprintf(command, "mkdir(\"%s\", S_IRWXU | S_IRWXG);", s2);
-    status = mkdir(s2, S_IRWXU | S_IRWXG);
-    printf("DNS_utilities_th_system3: POSIX.1-2001 call: %s\n", command);
-  }
-  else /* use system */
-  { 
-    sprintf(command, "%s %s %s", s1, s2, s3);
-    status = system(command);
-    printf("DNS_utilities_th_system3: System call: %s\n", command);
-  }
-  
-  if(status!=0) printf("DNS_utilities_th_system3: -> WARNING: Return value = %d\n", status);
-  return status;
-}
-
 /* construct an argv array from a string and return number of args */
 /* NOTE: str is modified and used as mem for argv! */
 int th_construct_argv(char *str, char ***argv)
