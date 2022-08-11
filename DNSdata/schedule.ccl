@@ -1,9 +1,9 @@
 # Schedule definitions for thorn DNSdata
 
-if (CCTK_EQUALS (initial_data,    "dNSdata") ||
-    CCTK_EQUALS (initial_lapse,   "dNSdata") ||
-    CCTK_EQUALS (initial_shift,   "dNSdata") ||
-    CCTK_EQUALS (initial_hydro,   "dNSdata"))
+if (CCTK_EQUALS (initial_data,    "DNSdata") ||
+    CCTK_EQUALS (initial_lapse,   "DNSdata") ||
+    CCTK_EQUALS (initial_shift,   "DNSdata") ||
+    CCTK_EQUALS (initial_hydro,   "DNSdata"))
 {
   SCHEDULE DNSdataPars IN CCTK_PARAMCHECK 
   {
