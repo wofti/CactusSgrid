@@ -76,35 +76,35 @@ int th_system3(char *s1, char *s2, char *s3)
   {
     sprintf(command, "rename(\"%s\", \"%s\");", s2, s3);
     status = rename(s2, s3);
-    printf("BNS_utilities_th_system3: ANSI C call: %s\n", command);
+    printf("DNS_utilities_th_system3: ANSI C call: %s\n", command);
   }
   else if( strcmp(s1,"rm -rf")==0 ) /* use remove */
   {
     if(strlen(s2)>0)
     {
       status = th_remove_dir(s2);
-      printf("BNS_utilities_th_system3: remove_dir(\"%s\");\n", s2);
+      printf("DNS_utilities_th_system3: remove_dir(\"%s\");\n", s2);
     }
     if(strlen(s3)>0)
     {
       status = th_remove_dir(s3);
-      printf("BNS_utilities_th_system3: remove_dir(\"%s\");\n", s3);
+      printf("DNS_utilities_th_system3: remove_dir(\"%s\");\n", s3);
     }
   }
   else if( strcmp(s1,"mkdir")== 0 ) /* use POSIX.1-2001 mkdir function */
   {
     sprintf(command, "mkdir(\"%s\", S_IRWXU | S_IRWXG);", s2);
     status = mkdir(s2, S_IRWXU | S_IRWXG);
-    printf("BNS_utilities_th_system3: POSIX.1-2001 call: %s\n", command);
+    printf("DNS_utilities_th_system3: POSIX.1-2001 call: %s\n", command);
   }
   else /* use system */
   { 
     sprintf(command, "%s %s %s", s1, s2, s3);
     status = system(command);
-    printf("BNS_utilities_th_system3: System call: %s\n", command);
+    printf("DNS_utilities_th_system3: System call: %s\n", command);
   }
   
-  if(status!=0) printf("BNS_utilities_th_system3: -> WARNING: Return value = %d\n", status);
+  if(status!=0) printf("DNS_utilities_th_system3: -> WARNING: Return value = %d\n", status);
   return status;
 }
 
@@ -134,13 +134,13 @@ int th_system_emu(const char *command)
   char *com = strdup(command); /* duplicate since construct_argv modifies its args */
   int ret, status;
 
-    printf("BNS_utilities_th_system_emu: th_system_emu: running command:\n%s\n", command);
+    printf("DNS_utilities_th_system_emu: th_system_emu: running command:\n%s\n", command);
     char **argv;
     construct_argv(com, &argv);
     ret = libsgrid_main(6, argv);
 
   status = ret;
-  if(status!=0) printf("BNS_utilities_th_system_emu: -> WARNING: Return value = %d\n", status);
+  if(status!=0) printf("DNS_utilities_th_system_emu: -> WARNING: Return value = %d\n", status);
   free(com);
   return status;
 }

@@ -1,16 +1,16 @@
-# Schedule definitions for thorn BNSdata
+# Schedule definitions for thorn DNSdata
 
-if (CCTK_EQUALS (initial_data,    "BNSdata") ||
-    CCTK_EQUALS (initial_lapse,   "BNSdata") ||
-    CCTK_EQUALS (initial_shift,   "BNSdata") ||
-    CCTK_EQUALS (initial_hydro,   "BNSdata"))
+if (CCTK_EQUALS (initial_data,    "dNSdata") ||
+    CCTK_EQUALS (initial_lapse,   "dNSdata") ||
+    CCTK_EQUALS (initial_shift,   "dNSdata") ||
+    CCTK_EQUALS (initial_hydro,   "dNSdata"))
 {
-  SCHEDULE BNSdataPars IN CCTK_PARAMCHECK 
+  SCHEDULE DNSdataPars IN CCTK_PARAMCHECK 
   {
     LANG: C
   } "Read pars from BNSdata_properties.txt"
 
-  SCHEDULE BNSdataReader IN HydroBase_Initial
+  SCHEDULE DNSdataReader IN HydroBase_Initial
   {
     LANG: C
   } "Read binary neutron star initial data"

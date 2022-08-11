@@ -1,4 +1,4 @@
-# Parameter definitions for thorn BNSdata
+# Parameter definitions for thorn DNSdata
 
 SHARES: IO
 USES STRING out_dir
@@ -8,27 +8,27 @@ SHARES: ADMBase
 
 EXTENDS KEYWORD initial_data
 {
-  "BNSdata" :: ""
+  "DNSdata" :: ""
 }
 
 EXTENDS KEYWORD initial_lapse
 {
-  "BNSdata" :: ""
+  "DNSdata" :: ""
 }
 
 EXTENDS KEYWORD initial_shift
 {
-  "BNSdata" :: ""
+  "DNSdata" :: ""
 }
 
 EXTENDS KEYWORD initial_dtlapse
 {
-  "BNSdata" :: ""
+  "DNSdata" :: ""
 }
 
 EXTENDS KEYWORD initial_dtshift
 {
-  "BNSdata" :: ""
+  "DNSdata" :: ""
 }
 
 
@@ -37,13 +37,13 @@ SHARES: HydroBase
 
 EXTENDS KEYWORD initial_hydro
 {
-  "BNSdata" :: ""
+  "DNSdata" :: ""
 }
 
 
 PRIVATE:
 
-# parameters also used in bam's BNSdataReader
+# parameters also used in bam's DNSdataReader
   
 STRING sgrid_exe "location of sgrid executable" STEERABLE=ALWAYS
 {
@@ -59,7 +59,7 @@ BOOLEAN keep_sgrid_output "whether we keep the output sgrid creates while runnin
 {
 } "no"
 
-BOOLEAN use_Interpolator "whether we use BNSdataReader_interpolator"
+BOOLEAN use_Interpolator "whether we use DNSdataReader_interpolator"
 {
 } "yes"
 
@@ -76,11 +76,11 @@ BOOLEAN Interpolate_make_finer_grid2 "make finer grid2 to get a good guess for X
 {
 } "yes"
 
-BOOLEAN rotation180 "rotate BNSdata by 180 degrees about z-axis [yes,no]"
+BOOLEAN rotation180 "rotate DNSdata by 180 degrees about z-axis [yes,no]"
 {
 } "no"
 
-STRING IDfiles_dir "Directory with ID .dat-files already interpolated to our current bam grid (needed if BNSdataReader_use_interpolator = no)"
+STRING IDfiles_dir "Directory with ID .dat-files already interpolated to our current bam grid (needed if DNSdataReader_use_interpolator = no)"
 {
   "" :: ""
 } ""

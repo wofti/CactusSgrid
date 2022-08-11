@@ -1,6 +1,6 @@
-# Interface definition for thorn BNSdata
+# Interface definition for thorn DNSdata
 
-IMPLEMENTS: BNSdata
+IMPLEMENTS: DNSdata
 
 INHERITS: grid SummationByParts ADMBase HydroBase
 
