@@ -94,6 +94,8 @@ void BNSdataReader(CCTK_ARGUMENTS)
   int set_dtshift = CCTK_EQUALS(initial_dtshift, "BNSdata");
   int set_hydro = CCTK_EQUALS(initial_hydro, "BNSdata");
 
+  printf("BNS_datareader: New directory \n");
+
   /* backup lapse and shift if needed */
   {
     if(!set_lapse)
@@ -111,7 +113,7 @@ void BNSdataReader(CCTK_ARGUMENTS)
       memcpy(betax_def, betax, npoints*sizeof(*betax_def));
       memcpy(betay_def, betay, npoints*sizeof(*betay_def));
       memcpy(betaz_def, betaz, npoints*sizeof(*betaz_def));
-      printf("BNS_datareader: Shift qqq has been backed up. \n");
+      printf("BNS_datareader: Shift has been backed up. \n");
     }
   }
 
