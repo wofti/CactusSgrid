@@ -1,5 +1,5 @@
 /* utilities.c */
-/* Wolfgang Tichy 2016*/
+/* Wolfgang Tichy and Michal Piro 8, 2022*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +58,7 @@ int th_remove_dir(char *which_dir)
       return -1;
     }
   }
+    printf("THORN_DNS:utilities/th_remove_dir: done \n");
   return 0;
 }
 
@@ -87,13 +88,13 @@ int th_system_emu(const char *command)
   char *com = strdup(command); /* duplicate since construct_argv modifies its args */
   int ret, status;
 
-    printf("DNS_utilities_th_system_emu: th_system_emu: running command:\n%s\n", command);
+    printf("THORN_DNS:utilities/th_system_emu: th_system_emu: running command:\n%s\n", command);
     char **argv;
     construct_argv(com, &argv);
     ret = libsgrid_main(6, argv);
 
   status = ret;
-  if(status!=0) printf("DNS_utilities_th_system_emu: -> WARNING: Return value = %d\n", status);
+  if(status!=0) printf("THORN_DNS:utilities/th_system_emu: -> WARNING: Return value = %d\n", status);
   free(com);
   return status;
 }
