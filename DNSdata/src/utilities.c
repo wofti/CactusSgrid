@@ -17,7 +17,7 @@
 
 
 /* use opendir to scan through dir and remove the entire dir */
-int th_remove_dir(char *which_dir)
+int DNS2_remove_dir(char *which_dir)
 {
   DIR           *d;
   struct dirent *dir;
@@ -35,7 +35,7 @@ int th_remove_dir(char *which_dir)
       snprintf(file, 999, "./%s/%s", which_dir, dir->d_name);
       //printf("*"); //print * for every deleted file
 
-      if(opendir(file)!=NULL) th_remove_dir(file);
+      if(opendir(file)!=NULL) DNS2_remove_dir(file);
       else
       {
         if(remove(file) != 0)
@@ -64,7 +64,7 @@ int th_remove_dir(char *which_dir)
 
 /* construct an argv array from a string and return number of args */
 /* NOTE: str is modified and used as mem for argv! */
-int th_construct_argv(char *str, char ***argv)
+int DNS2_construct_argv(char *str, char ***argv)
 {
   char *str1, *token, *saveptr;
   int count;
@@ -83,14 +83,14 @@ int th_construct_argv(char *str, char ***argv)
 }
 
 /* run a command, without a shell */
-int th_system_emu(const char *command)
+int DNS2_run(const char *command)
 {
   char *com = strdup(command); /* duplicate since construct_argv modifies its args */
   int ret, status;
 
     printf("THORN_DNS:utilities/th_system_emu: th_system_emu: running command:\n%s\n", command);
     char **argv;
-    construct_argv(com, &argv);
+    DNS2_construct_argv(com, &argv);
     ret = libsgrid_main(6, argv);
 
   status = ret;
@@ -102,7 +102,7 @@ int th_system_emu(const char *command)
 /* Lock a file from current file position to the end. The lock will be
    released when the file is closed.
    fd is a file descriptor open for writing. */
-int th_lock_curr_til_EOF(FILE *out)
+int DNS2_lock_curr_til_EOF(FILE *out)
 {
   int fd = fileno(out); /* get file dscriptor */
   if(fd==-1) return fd; /* return -1 on error */
@@ -111,51 +111,47 @@ int th_lock_curr_til_EOF(FILE *out)
 
 
 /* preliminary ... */
-double *th_dmalloc(int n)
+double *DNS2_dmalloc(int n)
 {
   double *p = (double *) malloc(sizeof(double) * n);
   
-  if (!p) th_errorexiti("out of memory (%d double)", n);
+  if (!p) DNS2_errorexiti("out of memory (%d double)", n);
   return p;
 }
 
-int *th_imalloc(int n)
+int *DNS2_imalloc(int n)
 {
   int *p = (int *) malloc(sizeof(int) * n);
   
-  if (!p) th_errorexiti("out of memory (%d int)", n);
+  if (!p) DNS2_errorexiti("out of memory (%d int)", n);
   return p;
 }
 
-char *th_cmalloc(int n)
+char *DNS2_cmalloc(int n)
 {
   char *p = (char *) malloc(sizeof(char) * n);
   
-  if (!p) th_errorexiti("out of memory (%d char)", n);
+  if (!p) DNS2_errorexiti("out of memory (%d char)", n);
   return p;
 }
 
-void *th_pmalloc(int n)
+void *DNS2_pmalloc(int n)
 {
   void *p = malloc(sizeof(void *) * n);
   
-  if (!p) th_errorexiti("out of memory (%d void *)", n);
+  if (!p) DNS2_errorexiti("out of memory (%d void *)", n);
   return p;
 }
-
-
-
-
 
 /* the one function every program should have */
 /* note that sgrid_main.h defines a macro so that the user does not have
    to specify __FILE__ and __LINE__ for location where the error occured
 */
 
-#undef th_errorexits
-#undef th_errorexiti
+#undef DNS2_errorexits
+#undef DNS2_errorexiti
 
-void th_errorexits(char *file, int line, char *s, char *t)
+void DNS2_errorexits(char *file, int line, char *s, char *t)
 {
   fflush(stdout);
   fprintf(stderr, "Error: ");
@@ -166,7 +162,7 @@ void th_errorexits(char *file, int line, char *s, char *t)
   exit(1);
 }
 
-void th_errorexiti(char *file, int line, char *s, int i)
+void DNS2_errorexiti(char *file, int line, char *s, int i)
 {
   fflush(stdout);
   fprintf(stderr, "Error: ");
