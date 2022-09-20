@@ -47,7 +47,7 @@ int level_l; /* counter that simulates level->l of bam */
 
 
 /* position filepointer after the string str */
-int position_fileptr_after_str(FILE *in, char *str)
+int DNS1_position_fileptr_after_str(FILE *in, char *str)
 {
   char line[STRLEN];
   
@@ -315,7 +315,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
   fp2 = fopen(IDfile, "rb");
   if(fp2==NULL) th_errorexits("could not open %s", IDfile);
   ndata = 20;
-  j=position_fileptr_after_str(fp2, "$BEGIN_data:\n");
+  j=DNS1_position_fileptr_after_str(fp2, "$BEGIN_data:\n");
   if(j==EOF) th_errorexits("could not find $BEGIN_data: in %s", IDfile);
   /* go over all points */
   for(i=0; i<npoints; i++)
@@ -506,7 +506,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
   if(fp1==NULL) th_errorexits("could not open %s", datadir);
 
   /* move fp1 to place where time = 0 is */
-  j=position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
+  j=DNS1_position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
   if(j==EOF) th_errorexits("could not find (time = 0) in %s", datadir);
 
   /* initialize pwp, set everything to default */  
