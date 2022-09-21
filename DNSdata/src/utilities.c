@@ -13,8 +13,6 @@
 #include <sys/wait.h>   /* for wait */
 #include <dirent.h>     /* for opendir */
 
-#include "utilities.h"
-
 
 /* use opendir to scan through dir and remove the entire dir */
 int DNS2_remove_dir(char *which_dir)
@@ -78,7 +76,7 @@ int DNS2_construct_argv(char *str, char ***argv)
     (*argv)[count] = token;
     if(token == NULL) break;
   }
-  //printf("saveptr=%p:%s\n", saveptr,saveptr);
+  printf(" ******* !!! ******* THORN_DNS:utilities/th_system_emu: th_construct_argv \n\n");
   return count;
 }
 
@@ -142,6 +140,10 @@ void *DNS2_pmalloc(int n)
   if (!p) DNS2_errorexiti("out of memory (%d void *)", n);
   return p;
 }
+
+
+
+
 
 /* the one function every program should have */
 /* note that sgrid_main.h defines a macro so that the user does not have

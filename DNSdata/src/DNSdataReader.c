@@ -1,4 +1,4 @@
-/*9;45M9;45m DNSdataReader.c */
+/* DNSdataReader.c */
 /* Wolfgang Tichy 8/2022 */
 /* Wolfgang Tichy 8/2022 */
 
@@ -17,7 +17,6 @@
 
 /* include my things */
 #include "DNSdataReader.h"
-#include "utilities.h"
 
 #define NDATAMAX 23
 #define STRLEN 16384
@@ -244,7 +243,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
       strcat(call_interpolator, " > /dev/null");
     fflush(stdout);
     ret = DNS2_run(call_interpolator);
-    printf("THORN_DNS:datareader: DNS1_system_emu returned: %d\n", ret);
+    printf("THORN_DNS:datareader: th_system_emu returned: %d\n", ret);
     fflush(stdout);
     if(ret)
     {
