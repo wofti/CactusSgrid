@@ -1,6 +1,5 @@
 /* DNSdataReader.c */
-/* Wolfgang Tichy 8/2022 */
-/* Wolfgang Tichy 8/2022 */
+/* Wolfgang Tichy and Michal Pirog 8, 2022 */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +16,8 @@
 
 /* include my things */
 #include "DNSdataReader.h"
+#include "utilities.h"
+
 
 #define NDATAMAX 23
 #define STRLEN 16384
@@ -44,7 +45,6 @@ double xmax2; // pos. of max density in star2"
 /* global counters */
 int level_l; /* counter that simulates level->l of bam */
 
-
 /* position filepointer after the string str */
 int DNS1_position_fileptr_after_str(FILE *in, char *str)
 {
@@ -54,6 +54,8 @@ int DNS1_position_fileptr_after_str(FILE *in, char *str)
   {
     if(strstr(line, str)!=NULL) return 1; //break;
   }
+
+//  printf("DNS1_position_fileptr_after_str: done_01 \n");
   return EOF;
 }
 
@@ -88,7 +90,6 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   int ret;
   double s180 = (1 - 2*rotation180);
   int use_interpolator = use_Interpolator;
-
   char command[10000];
   int status = 0;
 
@@ -105,7 +106,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     {
       alp_def = malloc(npoints*sizeof(*alp_def));
       memcpy(alp_def, alp, npoints*sizeof(*alp_def));
-      printf("THORN_DNS:datareader: Lapse  has been backed up. \n");
+      printf("DNS1_dataReader: Lapse has been backed up. \n");
     }
 
     if(!set_shift)
@@ -116,7 +117,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
       memcpy(betax_def, betax, npoints*sizeof(*betax_def));
       memcpy(betay_def, betay, npoints*sizeof(*betay_def));
       memcpy(betaz_def, betaz, npoints*sizeof(*betaz_def));
-      printf("THORN_DNS:datareader: Shift has been backed up. \n");
+      printf("DNS1_dataReader: Shift has been backed up. \n");
     }
   }
 
@@ -125,11 +126,11 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   MPI_Comm_rank(MPI_COMM_WORLD, &MPIrank); /* find MPI rank of this proc */
   MPI_Comm_size(MPI_COMM_WORLD, &MPIsize);
 
-  printf("THORN_DNS:datareader: <CCTK_INFO> was called for output \n");
+  printf("DNS1_dataReader: <CCTK_INFO> was called for output \n");
   CCTK_INFO ("Setting up DNS initial data");
 
   /* say where we are */
-  printf("THORN_DNS:datareader: level_l=%d  rank=%d \n", level_l, MPIrank);
+  printf("DNS1_dataReader: level_l=%d  rank=%d \n", level_l, MPIrank);
 
   /* initialize file names */
   sprintf(gridfile, "%s/grid_level_%d_proc_%d.dat", out_dir, level_l, MPIrank);
@@ -170,25 +171,25 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
        files generated in a previous run */
 
     sprintf(IDfile, "%s/ID_level_%d_proc_%d.dat", IDfiles_dir, level_l, MPIrank);
-    printf("THORN_DNS:datareader: Looking for file %s\n", IDfile);
+    printf("DNS1_dataReader: Looking for file %s\n", IDfile);
 
     /* call interpolator if file cannot be opened */
     fp2 = fopen(IDfile, "rb");
     if(fp2==NULL)
     {
-      printf("THORN_DNS:datareader: Cannot open %s\n", IDfile);
+      printf("DNS1_dataReader: Cannot open %s\n", IDfile);
       /* check if other IDfile exists */
       sprintf(IDfile, "%s/ID_level_%d_proc_%d.dat", out_dir, level_l, MPIrank);
       fp2 = fopen(IDfile, "rb");
       if(fp2==NULL)
       {
-        printf("THORN_DNS:datareader: Cannot open %s\n", IDfile);
-        printf("THORN_DNS:datareader: Will call interpolator.\n");
+        printf("DNS1_dataReader: Cannot open %s\n", IDfile);
+        printf("DNS1_dataReader: Will call interpolator.\n");
         use_interpolator = 1;
       }
       else
       {
-        printf("THORN_DNS:datareader: %s exists, no need to call interpolator.\n", IDfile);
+        printf("DNS1_dataReader: %s exists, no need to call interpolator.\n", IDfile);
         use_interpolator = 0;
         //copy_IDfile_from_previous = 1; /* copy it to current outdir later */
         fclose(fp2);
@@ -196,7 +197,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     }
     else
     {
-      printf("THORN_DNS:datareader: %s exists, no need to call interpolator.\n", IDfile);
+      printf("DNS1_dataReader: %s exists, no need to call interpolator.\n", IDfile);
       use_interpolator = 0;
       fclose(fp2);
     }
@@ -211,12 +212,12 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     sprintf(IDfile_new, "%s%s", IDfile, "_new");
 
     /* info */
-    printf("THORN_DNS:datareader: sgridoutdir = %s\n", sgridoutdir);
-    printf("THORN_DNS:datareader: sgridcheckpoint_indir = %s\n", sgridcheckpoint_indir);
+    printf("DNS1_dataReader: sgridoutdir = %s\n", sgridoutdir);
+    printf("DNS1_dataReader: sgridcheckpoint_indir = %s\n", sgridcheckpoint_indir);
 
     DNS2_remove_dir(sgridoutdir);
     mkdir("mkdir", S_IRWXU | S_IRWXG);
-    printf("THORN_DNS:datareader: New directory created \n");
+    printf("DNS1_dataReader:datareader: New directory created \n");
 
     fflush(stdout);
 
@@ -243,7 +244,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
       strcat(call_interpolator, " > /dev/null");
     fflush(stdout);
     ret = DNS2_run(call_interpolator);
-    printf("THORN_DNS:datareader: th_system_emu returned: %d\n", ret);
+    printf("DNS1_dataReader: DNS2_run returned: %d\n", ret);
     fflush(stdout);
     if(ret)
     {
@@ -267,23 +268,23 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
       fp1 = fopen(sgridallargsfile, "a");
       if(fp1==NULL) DNS2_errorexits("could not open %s", sgridallargsfile);
       if(DNS2_lock_curr_til_EOF(fp1)!=0)
-        printf("THORN_DNS:datareader: Could not lock file %s on proc %d\n",
+        printf("DNS1_dataReader: Could not lock file %s on proc %d\n",
                sgridallargsfile, MPIrank);
       fprintf(fp1, "%s%s", sgridargs, "\n");
       fclose(fp1);
       /* errorexit("interpolator returned non-zero exit code!"); */
-      printf("THORN_DNS:datareader: Interpolator returned non-zero exit code: %d\n", ret);
+      printf("DNS1_dataReader: Interpolator returned non-zero exit code: %d\n", ret);
       fflush(stdout);
       // FIXME: need CCTK function that returns number of last level
       if(1) //(level_l == grid->lmax)
       {
-        printf("THORN_DNS:datareader: FIXME: need CCTK function that returns number of last level\n");
-        printf("THORN_DNS:datareader: Ok I stop here. Sombody has to run sgrid to make ID files "
-               "THORN_DNS:datareader: for each proc.\n\n");
-        printf("THORN_DNS:datareader: For proc%d, sgrid needs to be run as follows:\n", MPIrank);
-        printf("THORN_DNS:datareader: %s --argsfile %s\n\n", sgrid_exe, sgridargsfile);
-        printf("THORN_DNS:datareader: OR compile sgrid with MPI and run it as:\n");
-        printf("THORN_DNS:datareader: %s --argsfile %s\n\n", sgrid_exe, sgridallargsfile);
+        printf("DNS1_dataReader: FIXME: need CCTK function that returns number of last level\n");
+        printf("DNS1_dataReader: Ok I stop here. Sombody has to run sgrid to make ID files "
+               "DNS1_dataReader: for each proc.\n\n");
+        printf("DNS1_dataReader: For proc%d, sgrid needs to be run as follows:\n", MPIrank);
+        printf("DNS1_dataReader: %s --argsfile %s\n\n", sgrid_exe, sgridargsfile);
+        printf("DNS1_dataReader: OR compile sgrid with MPI and run it as:\n");
+        printf("DNS1_dataReader: %s --argsfile %s\n\n", sgrid_exe, sgridallargsfile);
         fflush(stdout);
         // FIXME: the code should stop here on all proc!!!
         //MPI_Finalize();
@@ -302,12 +303,12 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   }
   else
   {
-    printf("THORN_DNS:datareader: Skipping interpolator, reading data from %s\n", IDfile);
+    printf("DNS1_dataReader: Skipping interpolator, reading data from %s\n", IDfile);
   }
 
   /* info about filenames */
-  printf("THORN_DNS:datareader: gridfile = %s\n", gridfile);
-  printf("THORN_DNS:datareader: IDfile = %s\n", IDfile);
+  printf("DNS1_dataReader: gridfile = %s\n", gridfile);
+  printf("DNS1_dataReader: IDfile = %s\n", IDfile);
   fflush(stdout);
 
   /* read ADM variables from files generated by the interpolator */
@@ -403,22 +404,22 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     /* print g_ij, K_ij, beta^i, alpha */
     if(pr)
     {
-      printf("THORN_DNS:datareader: (x,y,z)=(%g,%g,%g)\n", x[i],y[i],z[i]);
+      printf("DNS1_dataReader: (x,y,z)=(%g,%g,%g)\n", x[i],y[i],z[i]);
 
-      printf("THORN_DNS:datareader: alpha=%g beta=%g %g %g\n",
+      printf("DNS1_dataReader: alpha=%g beta=%g %g %g\n",
 	alp[i], betax[i], betay[i], betaz[i]);  
 
-      printf("THORN_DNS:datareader: g=%g %g %g %g %g %g \n",
+      printf("DNS1_dataReader: g=%g %g %g %g %g %g \n",
 	gxx[i], gxy[i], gxz[i], gyy[i], gyz[i], gzz[i]);
     
-      printf("THORN_DNS:datareader: k=%g %g %g %g %g %g\n",
+      printf("DNS1_dataReader: k=%g %g %g %g %g %g\n",
 	kxx[i], kxy[i], kxz[i], kyy[i], kyz[i], kzz[i]);
 
-      printf("THORN_DNS:datareader: rho=%g p=%g epsl=%g v=%g %g %g\n",
+      printf("DNS1_dataReader: rho=%g p=%g epsl=%g v=%g %g %g\n",
         rho[i], press[i], eps[i],
         matter_vx[i], matter_vy[i], matter_vz[i]);
 
-      printf("THORN_DNS:datareader: \n");
+      printf("DNS1_dataReader: \n");
     }
     /* check if data makes sense */
     detg=(2.*gxy[i]*gxz[i]*gyz[i] + gxx[i]*gyy[i]*gzz[i] -
@@ -427,7 +428,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
 
     if(detg<=0)
     {
-      printf("THORN_DNS:datareader: det(g_ij)=%g at ccc=i=%d:  x=%g y=%g z=%g\n",
+      printf("DNS1_dataReader: det(g_ij)=%g at ccc=i=%d:  x=%g y=%g z=%g\n",
              detg, i, x[i], y[i], z[i]);
        //errorexit("found a point with det(g_ij)<=0.");
     }
@@ -437,14 +438,14 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   {
     if(set_dtlapse)
     {
-      printf("THORN_DNS:datareader: <CCTK_INFO> was called for output \n");
+      printf("DNS1_dataReader: <CCTK_INFO> was called for output \n");
       CCTK_INFO("Setting time derivatives of lapse");
       DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, alp, dtalp, Omega);
     }
 
     if(set_dtshift)
     {
-      printf("THORN_DNS:datareader: <CCTK_INFO> was called for output \n");
+      printf("DNS1_dataReader: <CCTK_INFO> was called for output \n");
       CCTK_INFO("Setting time derivatives of shift");
       DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betax, dtbetax, Omega);
       DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betay, dtbetay, Omega);
@@ -471,6 +472,8 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
 
   /* increase level_l counter */
   level_l++;
+    
+//  printf("DNS1_dataReader: done_02 \n");
 }
 
 /* get DNSdata pars */
@@ -485,18 +488,16 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
   double ret;
   int i, j, count, start; 
 
-  CCTK_INFO ("THORN_DNS:dataPars: Reading pars for DNS initial data");
+  CCTK_INFO ("DNS1_dataPars: Reading pars for DNS initial data");
 
   /* get DNSdataReader_sgrid_datadir and remove any trailing / */
-  //snprintf(datadir, STRLEN-1, "%s", Gets("DNSdataReader_sgrid_datadir"));
   snprintf(datadir, STRLEN-1, "%s", sgrid_datadir);
   j = strlen(datadir);
   if(datadir[j-1]=='/')
   { 
     datadir[j-1]=0;
-    //Sets("DNSdataReader_sgrid_datadir", datadir);
     ret=CCTK_ParameterSet(sgrid_datadir, "DNSdata", datadir);
-    if(ret!=0) printf("THORN_DNS:dataPars: CCTK_ParameterSet returned non-zero exit code!\n");
+    if(ret!=0) printf("DNS1_dataPars: CCTK_ParameterSet returned non-zero exit code!\n");
   }
   strcat(datadir, "/BNSdata_properties.txt");
 
@@ -540,12 +541,12 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
 
   if(DNS_EoS_n_pieces == 1)
   {
-    printf("THORN_DNS:dataPars: Only 1 entry in n_list  ->  single polytrope\n");
-    printf("THORN_DNS:dataPars: rho0_list %s\n", strrho0);
+    printf("DNS1_dataPars: Only 1 entry in n_list  ->  single polytrope\n");
+    printf("DNS1_dataPars: rho0_list %s\n", strrho0);
   }
   else
   {
-    printf("THORN_DNS:dataPars: pwp with %d pieces\n", DNS_EoS_n_pieces);
+    printf("DNS1_dataPars: pwp with %d pieces\n", DNS_EoS_n_pieces);
     /* process string with rho0_list */
     start = 1;
     /* use count=1 here, because DNS_EoS_rho0[1] is now the first entry
@@ -607,38 +608,27 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
   fclose(fp1);
 
   /* info */
-  printf("THORN_DNS:pars: assuming q:=h-1\n");
-
-  printf("THORN_DNS:pars: Use pwp with %d pieces \n", DNS_EoS_n_pieces);
-  printf("THORN_DNS:pars: rho0            q           P           kappa          n           k \n");
+  printf("DNS1_dataPars: assuming q:=h-1\n");
+  printf("DNS1_dataPars: Use pwp with %d pieces \n", DNS_EoS_n_pieces);
+  printf("DNS1_dataPars: rho0            q           P           kappa          n           k \n");
   for(i=0;i<=DNS_EoS_n_pieces;i++)
   {
-    printf("THORN_DNS:pars: %e %e %e %e %e %e \n",
+    printf("DNS1_dataPars: %e %e %e %e %e %e \n",
     DNS_EoS_rho0[i], DNS_EoS_q[i], DNS_EoS_P[i], DNS_EoS_kappa[i], DNS_EoS_n[i], DNS_EoS_k[i]);
   }
-  printf("THORN_DNS:pars: Omega = %g\n", Omega);
-  printf("THORN_DNS:pars: ecc = %g\n", ecc);
-  printf("THORN_DNS:pars: rdot = %g\n", rdot);
-  printf("THORN_DNS:pars: m01 = %g\n", m01);
-  printf("THORN_DNS:pars: m02 = %g\n", m02);
-  printf("THORN_DNS:pars: xmax1 - sgrid_x_CM = %g\n", xmax1);
-  printf("THORN_DNS:pars: xmax2 - sgrid_x_CM = %g\n", xmax2);
-  printf("THORN_DNS:pars: sgrid_x_CM = %g\n", sgrid_x_CM);
-
-  /* Here we could set some carpet pars that control the grid: */
-  ///* set some pars relevant for setting up bam's grid */
-  //printf("Setting some pars relevant for setting up bam's grid:\n");
-  //Setd("mass1", m01);
-  //Setd("mass2", m02);
-  //Setd("px1", xmax1);
-  //Setd("px2", xmax2);
-  //printf("mass1 = %g\n", Gets("mass1"));
-  //printf("mass2 = %g\n", Gets("mass2"));    
-  //printf("bhx1 = %g\n", Gets("px1"));
-  //printf("bhx2 = %g\n", Gets("px2"));    
+  printf("DNS1_dataPars: Omega = %g\n", Omega);
+  printf("DNS1_dataPars: ecc = %g\n", ecc);
+  printf("DNS1_dataPars: rdot = %g\n", rdot);
+  printf("DNS1_dataPars: m01 = %g\n", m01);
+  printf("DNS1_dataPars: m02 = %g\n", m02);
+  printf("DNS1_dataPars: xmax1 - sgrid_x_CM = %g\n", xmax1);
+  printf("DNS1_dataPars: xmax2 - sgrid_x_CM = %g\n", xmax2);
+  printf("DNS1_dataPars: sgrid_x_CM = %g\n", sgrid_x_CM);
 
   /* init level_l counter */
   level_l = 0;
+  
+//  printf("DNS1_dataPars: done_03 \n");
 }
 
 /* select pwp pars */
@@ -653,6 +643,7 @@ void DNS1_select_polytrope_n_kappa_k_of_hm1(double hm1,
   *n     = DNS_EoS_n[m];
   *kappa = DNS_EoS_kappa[m];
   *k     = DNS_EoS_k[m];
+//  printf("DNS1_select_polytrope_n_kappa_k_of_hm1: done_04 \n");
 }
 
 
@@ -687,4 +678,6 @@ void DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
   /* free derivs */
   free(dyvar);
   free(dxvar);
+    
+//  printf("DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV: done_05 \n");
 }

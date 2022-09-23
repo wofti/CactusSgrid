@@ -1,5 +1,5 @@
 /* DNSdataReader.h */
-/* Wolfgang Tichy 8/2016 */
+/* Wolfgang Tichy and Michal Pirog 8, 2022 */
 
 #define PI  3.14159265358979323846264338327950
 #define PIh 1.57079632679489661923132169163975

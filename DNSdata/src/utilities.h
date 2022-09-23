@@ -1,5 +1,5 @@
 /* utilities.h */
-/* Wolfgang Tichy, 2016 */
+/* Wolfgang Tichy and Michal Pirog 8, 2022 */
 
 /* constants */
 #ifdef PI

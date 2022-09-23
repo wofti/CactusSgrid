@@ -1,5 +1,5 @@
 /* utilities.c */
-/* Wolfgang Tichy and Michal Piro 8, 2022*/
+/* Wolfgang Tichy and Michal Pirog 8, 2022 */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +12,8 @@
 #include <sys/types.h>  /* for pid_t */
 #include <sys/wait.h>   /* for wait */
 #include <dirent.h>     /* for opendir */
+
+#include "utilities.h"
 
 
 /* use opendir to scan through dir and remove the entire dir */
@@ -56,7 +58,7 @@ int DNS2_remove_dir(char *which_dir)
       return -1;
     }
   }
-    printf("THORN_DNS:utilities/th_remove_dir: done \n");
+//    printf("DNS2_remove_dir: done_06 \n");
   return 0;
 }
 
@@ -76,7 +78,7 @@ int DNS2_construct_argv(char *str, char ***argv)
     (*argv)[count] = token;
     if(token == NULL) break;
   }
-  printf(" ******* !!! ******* THORN_DNS:utilities/th_system_emu: th_construct_argv \n\n");
+//  printf("DNS2_construct_argv: done_07 \n");
   return count;
 }
 
@@ -86,14 +88,16 @@ int DNS2_run(const char *command)
   char *com = strdup(command); /* duplicate since construct_argv modifies its args */
   int ret, status;
 
-    printf("THORN_DNS:utilities/th_system_emu: th_system_emu: running command:\n%s\n", command);
-    char **argv;
-    DNS2_construct_argv(com, &argv);
-    ret = libsgrid_main(6, argv);
+  printf("DNS2_run: running command:\n%s\n", command);
+  char **argv;
+  DNS2_construct_argv(com, &argv);
+  ret = libsgrid_main(6, argv);
 
   status = ret;
-  if(status!=0) printf("THORN_DNS:utilities/th_system_emu: -> WARNING: Return value = %d\n", status);
+  if(status!=0) printf("DNS2_run: -> WARNING: Return value = %d\n", status);
   free(com);
+    
+//  printf("DNS2_run: done_08 \n");
   return status;
 }
 
@@ -105,6 +109,7 @@ int DNS2_lock_curr_til_EOF(FILE *out)
   int fd = fileno(out); /* get file dscriptor */
   if(fd==-1) return fd; /* return -1 on error */
   return lockf(fd, F_LOCK, 0);
+//  printf("DNS2_lock_curr_til_EOF: done_09 \n");
 }
 
 
@@ -114,6 +119,8 @@ double *DNS2_dmalloc(int n)
   double *p = (double *) malloc(sizeof(double) * n);
   
   if (!p) DNS2_errorexiti("out of memory (%d double)", n);
+
+//  printf("*DNS2_dmalloc: done_10a \n");
   return p;
 }
 
@@ -122,6 +129,8 @@ int *DNS2_imalloc(int n)
   int *p = (int *) malloc(sizeof(int) * n);
   
   if (!p) DNS2_errorexiti("out of memory (%d int)", n);
+  
+//  printf("*DNS2_imalloc: done_10b \n");
   return p;
 }
 
@@ -130,6 +139,8 @@ char *DNS2_cmalloc(int n)
   char *p = (char *) malloc(sizeof(char) * n);
   
   if (!p) DNS2_errorexiti("out of memory (%d char)", n);
+  
+//  printf("*DNS2_cmalloc: done_10c \n");
   return p;
 }
 
@@ -138,17 +149,14 @@ void *DNS2_pmalloc(int n)
   void *p = malloc(sizeof(void *) * n);
   
   if (!p) DNS2_errorexiti("out of memory (%d void *)", n);
+  
+//  printf("*DNS2_pmalloc: done_10d \n");
   return p;
 }
 
-
-
-
-
 /* the one function every program should have */
 /* note that sgrid_main.h defines a macro so that the user does not have
-   to specify __FILE__ and __LINE__ for location where the error occured
-*/
+   to specify __FILE__ and __LINE__ for location where the error occured */
 
 #undef DNS2_errorexits
 #undef DNS2_errorexiti
@@ -160,7 +168,7 @@ void DNS2_errorexits(char *file, int line, char *s, char *t)
   fprintf(stderr, s, t);
   fprintf(stderr, "  (%s, line %d)\n", file, line);
   fflush(stderr);
-  //sgrid_MPI_Finalize();
+//  printf("DNS2_errorexits: done_11 \n");
   exit(1);
 }
 
@@ -171,7 +179,7 @@ void DNS2_errorexiti(char *file, int line, char *s, int i)
   fprintf(stderr, s, i);
   fprintf(stderr, "  (%s, line %d)\n", file, line);
   fflush(stderr);
-  //sgrid_MPI_Finalize();
+//  printf("DNS2_errorexiti: done_12 \n");
   exit(1);
 }
 
