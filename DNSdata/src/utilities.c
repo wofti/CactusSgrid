@@ -101,18 +101,6 @@ int DNS2_run(const char *command)
   return status;
 }
 
-/* Lock a file from current file position to the end. The lock will be
-   released when the file is closed.
-   fd is a file descriptor open for writing. */
-int DNS2_lock_curr_til_EOF(FILE *out)
-{
-  int fd = fileno(out); /* get file dscriptor */
-  if(fd==-1) return fd; /* return -1 on error */
-  return lockf(fd, F_LOCK, 0);
-//  printf("DNS2_lock_curr_til_EOF: done_09 \n");
-}
-
-
 /* preliminary ... */
 double *DNS2_dmalloc(int n)
 {

@@ -246,52 +246,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     ret = DNS2_run(call_interpolator);
     printf("DNS1_dataReader: DNS2_run returned: %d\n", ret);
     fflush(stdout);
-    if(ret)
-    {
-      char sgridargsfile[STRLEN];
-      char sgridallargsfile[STRLEN];
-      char *str;
-      FILE *fp1;
-      /* make str that contains args from this failed sgrid run */
-      sgridargs=strstr(call_interpolator, sgrid_datadir);
-      str = strstr(sgridargs, IDfile_new);     /* points to IDfile_new */
-      str = str + strlen(IDfile_new)-4;        /* points to _new */
-      str[0] = str[1] = str[2] = str[3] = ' '; /* white out _new */
-      /* write all args from this proc in a file */
-      sprintf(sgridargsfile, "%s/sgridargs_proc_%d.txt", out_dir, MPIrank);
-      fp1 = fopen(sgridargsfile, "a");
-      if(fp1==NULL) DNS2_errorexits("could not open %s", sgridargsfile);
-      fprintf(fp1, "%s%s", sgridargs, "\n");
-      fclose(fp1);
-      /* write all args from this proc in a 2nd common file */
-      sprintf(sgridallargsfile, "%s/sgridargs_allproc.txt", out_dir);
-      fp1 = fopen(sgridallargsfile, "a");
-      if(fp1==NULL) DNS2_errorexits("could not open %s", sgridallargsfile);
-      if(DNS2_lock_curr_til_EOF(fp1)!=0)
-        printf("DNS1_dataReader: Could not lock file %s on proc %d\n",
-               sgridallargsfile, MPIrank);
-      fprintf(fp1, "%s%s", sgridargs, "\n");
-      fclose(fp1);
-      /* errorexit("interpolator returned non-zero exit code!"); */
-      printf("DNS1_dataReader: Interpolator returned non-zero exit code: %d\n", ret);
-      fflush(stdout);
-      // FIXME: need CCTK function that returns number of last level
-      if(1) //(level_l == grid->lmax)
-      {
-        printf("DNS1_dataReader: FIXME: need CCTK function that returns number of last level\n");
-        printf("DNS1_dataReader: Ok I stop here. Sombody has to run sgrid to make ID files "
-               "DNS1_dataReader: for each proc.\n\n");
-        printf("DNS1_dataReader: For proc%d, sgrid needs to be run as follows:\n", MPIrank);
-        printf("DNS1_dataReader: %s --argsfile %s\n\n", sgrid_exe, sgridargsfile);
-        printf("DNS1_dataReader: OR compile sgrid with MPI and run it as:\n");
-        printf("DNS1_dataReader: %s --argsfile %s\n\n", sgrid_exe, sgridallargsfile);
-        fflush(stdout);
-        // FIXME: the code should stop here on all proc!!!
-        //MPI_Finalize();
-        //exit(0);
-      }
-      return;
-    }
+
     /* move IDfile_new to IDfile */
     rename(IDfile_new, IDfile);
 

@@ -33,7 +33,6 @@ void errorexiti(char *file, int line, char *s, int i);
 
 
 int DNS2_run(const char *command);
-int DNS2_lock_curr_til_EOF(FILE *out);
 int DNS2_construct_argv(char *str, char ***argv);
 double *DNS2_dmalloc(int n);
 int *DNS2_imalloc(int n);
