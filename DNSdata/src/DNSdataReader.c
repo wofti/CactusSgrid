@@ -1,13 +1,12 @@
 /* DNSdataReader.c */
-/* Wolfgang Tichy and Michal Pirog 8, 2022 */
+/* Wolfgang Tichy 8/2016 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <math.h>
 #include <mpi.h>
-
-#include <sys/stat.h>
 
 /* include cactus stuff */
 #include <cctk.h>
@@ -16,8 +15,6 @@
 
 /* include my things */
 #include "DNSdataReader.h"
-#include "utilities.h"
-
 
 #define NDATAMAX 23
 #define STRLEN 16384
@@ -45,8 +42,9 @@ double xmax2; // pos. of max density in star2"
 /* global counters */
 int level_l; /* counter that simulates level->l of bam */
 
+
 /* position filepointer after the string str */
-int DNS1_position_fileptr_after_str(FILE *in, char *str)
+int DNS_position_fileptr_after_str(FILE *in, char *str)
 {
   char line[STRLEN];
   
@@ -54,14 +52,12 @@ int DNS1_position_fileptr_after_str(FILE *in, char *str)
   {
     if(strstr(line, str)!=NULL) return 1; //break;
   }
-
-//  printf("DNS1_position_fileptr_after_str: done_01 \n");
   return EOF;
 }
 
 
 /* Compute DNSdataReader data */
-void DNS1_dataReader(CCTK_ARGUMENTS)
+void DNSdataReader(CCTK_ARGUMENTS)
 {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
@@ -90,8 +86,6 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   int ret;
   double s180 = (1 - 2*rotation180);
   int use_interpolator = use_Interpolator;
-  char command[10000];
-  int status = 0;
 
   /* which variables to set */
   int set_lapse = CCTK_EQUALS(initial_lapse, "DNSdata");
@@ -106,7 +100,6 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     {
       alp_def = malloc(npoints*sizeof(*alp_def));
       memcpy(alp_def, alp, npoints*sizeof(*alp_def));
-      printf("DNS1_dataReader: Lapse has been backed up. \n");
     }
 
     if(!set_shift)
@@ -117,7 +110,6 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
       memcpy(betax_def, betax, npoints*sizeof(*betax_def));
       memcpy(betay_def, betay, npoints*sizeof(*betay_def));
       memcpy(betaz_def, betaz, npoints*sizeof(*betaz_def));
-      printf("DNS1_dataReader: Shift has been backed up. \n");
     }
   }
 
@@ -126,16 +118,20 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   MPI_Comm_rank(MPI_COMM_WORLD, &MPIrank); /* find MPI rank of this proc */
   MPI_Comm_size(MPI_COMM_WORLD, &MPIsize);
 
-  printf("DNS1_dataReader: <CCTK_INFO> was called for output \n");
   CCTK_INFO ("Setting up DNS initial data");
 
   /* say where we are */
-  printf("DNS1_dataReader: level_l=%d  rank=%d \n", level_l, MPIrank);
+  printf("DNSdataReader: ");
+  printf("(level_l=%d  rank=%d)\n", level_l, MPIrank);
+
+  /* some info */
+  printf("  sgrid_x_CM = %g\n", sgrid_x_CM);
 
   /* initialize file names */
   sprintf(gridfile, "%s/grid_level_%d_proc_%d.dat", out_dir, level_l, MPIrank);
   sprintf(sgridoutdir, "%s/sgrid_level_%d_proc_%d", out_dir, level_l, MPIrank);
-  sprintf(sgridoutdir_previous, "%s/sgrid_level_%d_proc_%d_previous", out_dir, level_l, MPIrank);
+  sprintf(sgridoutdir_previous, "%s/sgrid_level_%d_proc_%d_previous",
+          out_dir, level_l, MPIrank);
   snprintf(sgridcheckpoint_indir, STRLEN-1, "%s", sgrid_datadir);
   stringptr = strrchr(sgrid_datadir, '/'); /* find last / */
   if(stringptr==NULL) /* no / found in DNSdataReader_sgrid_datadir */
@@ -143,9 +139,10 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   else
     snprintf(sgridparfile, STRLEN-1, "%s%s", stringptr+1, ".par");
   
-  /* dump the grid points covered by this processor on this level in gridfile */
+  /* dump the grid points covered by this processor on this level 
+     in gridfile */
   fp1 = fopen(gridfile, "wb");
-  if(fp1==NULL) DNS2_errorexits("could not open %s", gridfile);
+  if(fp1==NULL) SGRID_errorexits("could not open %s", gridfile);
   fprintf(fp1, "%s", "# this pointsfile contains the (x+sgrid_x_CM, y, z) of the bam grid points\n");
   fprintf(fp1, "%s", "$BEGIN_data:\n");
   for(i=0; i<npoints; i++)
@@ -169,27 +166,26 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     /* If you want to use previously generated ID use these two lines
        Set IDfiles_dir to the dir where you put the "ID*.dat"
        files generated in a previous run */
-
     sprintf(IDfile, "%s/ID_level_%d_proc_%d.dat", IDfiles_dir, level_l, MPIrank);
-    printf("DNS1_dataReader: Looking for file %s\n", IDfile);
+    printf("Looking for file %s\n", IDfile);
 
     /* call interpolator if file cannot be opened */
     fp2 = fopen(IDfile, "rb");
     if(fp2==NULL)
     {
-      printf("DNS1_dataReader: Cannot open %s\n", IDfile);
+      printf("Cannot open %s\n", IDfile);
       /* check if other IDfile exists */
       sprintf(IDfile, "%s/ID_level_%d_proc_%d.dat", out_dir, level_l, MPIrank);
       fp2 = fopen(IDfile, "rb");
       if(fp2==NULL)
       {
-        printf("DNS1_dataReader: Cannot open %s\n", IDfile);
-        printf("DNS1_dataReader: Will call interpolator.\n");
+        printf("Cannot open %s\n", IDfile);
+        printf("Will call interpolator.\n");
         use_interpolator = 1;
       }
       else
       {
-        printf("DNS1_dataReader: %s exists, no need to call interpolator.\n", IDfile);
+        printf("%s exists, no need to call interpolator.\n", IDfile);
         use_interpolator = 0;
         //copy_IDfile_from_previous = 1; /* copy it to current outdir later */
         fclose(fp2);
@@ -197,7 +193,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     }
     else
     {
-      printf("DNS1_dataReader: %s exists, no need to call interpolator.\n", IDfile);
+      printf("%s exists, no need to call interpolator.\n", IDfile);
       use_interpolator = 0;
       fclose(fp2);
     }
@@ -212,13 +208,13 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     sprintf(IDfile_new, "%s%s", IDfile, "_new");
 
     /* info */
-    printf("DNS1_dataReader: sgridoutdir = %s\n", sgridoutdir);
-    printf("DNS1_dataReader: sgridcheckpoint_indir = %s\n", sgridcheckpoint_indir);
+    printf("DNSdataReader:\n");
+    printf("  sgridoutdir = %s\n", sgridoutdir);
+    printf("  sgridcheckpoint_indir = %s\n", sgridcheckpoint_indir);
 
-    DNS2_remove_dir(sgridoutdir);
-    mkdir("mkdir", S_IRWXU | S_IRWXG);
-    printf("DNS1_dataReader:datareader: New directory created \n");
-
+    /* remove any old sgridoutdir and make a new one */
+    SGRID_system2("rm -rf", sgridoutdir);
+    SGRID_system2("mkdir", sgridoutdir);
     fflush(stdout);
 
     /* call the interpolator that will generate the ID */
@@ -243,35 +239,81 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     if(!keep_sgrid_output)
       strcat(call_interpolator, " > /dev/null");
     fflush(stdout);
-    ret = DNS2_run(call_interpolator);
-    printf("DNS1_dataReader: DNS2_run returned: %d\n", ret);
+    ret = DNS_run(call_interpolator);
+    printf("DNSdataReader: SGRID_run returned: %d\n", ret);
     fflush(stdout);
-
+    if(ret)
+    {
+      char sgridargsfile[STRLEN];
+      char sgridallargsfile[STRLEN];
+      char *str;
+      FILE *fp1;
+      /* make str that contains args from this failed sgrid run */
+      sgridargs=strstr(call_interpolator, sgrid_datadir);
+      str = strstr(sgridargs, IDfile_new);     /* points to IDfile_new */
+      str = str + strlen(IDfile_new)-4;        /* points to _new */
+      str[0] = str[1] = str[2] = str[3] = ' '; /* white out _new */
+      /* write all args from this proc in a file */
+      sprintf(sgridargsfile, "%s/sgridargs_proc_%d.txt", out_dir, MPIrank);
+      fp1 = fopen(sgridargsfile, "a");
+      if(fp1==NULL) SGRID_errorexits("could not open %s", sgridargsfile);
+      fprintf(fp1, "%s%s", sgridargs, "\n");
+      fclose(fp1);
+      /* write all args from this proc in a 2nd common file */
+      sprintf(sgridallargsfile, "%s/sgridargs_allproc.txt", out_dir);
+      fp1 = fopen(sgridallargsfile, "a");
+      if(fp1==NULL) SGRID_errorexits("could not open %s", sgridallargsfile);
+      if(SGRID_lock_curr_til_EOF(fp1)!=0)
+        printf("Could not lock file %s on proc %d\n",
+               sgridallargsfile, MPIrank);
+      fprintf(fp1, "%s%s", sgridargs, "\n");
+      fclose(fp1);
+      /* errorexit("interpolator returned non-zero exit code!"); */
+      printf("interpolator returned non-zero exit code: %d\n", ret);
+      fflush(stdout);
+      // FIXME: need CCTK function that returns number of last level
+      if(1) //(level_l == grid->lmax)
+      {
+        printf("FIXME: need CCTK function that returns number of last level\n");
+      
+        printf("Ok I stop here. Sombody has to run sgrid to make ID files "
+               "for each proc.\n\n");
+        printf("For proc%d, sgrid needs to be run as follows:\n", MPIrank);
+        printf("%s --argsfile %s\n\n", sgrid_exe, sgridargsfile);
+        printf("OR compile sgrid with MPI and run it as:\n");
+        printf("%s --argsfile %s\n\n", sgrid_exe, sgridallargsfile);
+        fflush(stdout);
+        // FIXME: the code should stop here on all proc!!!
+        //MPI_Finalize();
+        //exit(0);
+      }
+      return;
+    }
     /* move IDfile_new to IDfile */
     rename(IDfile_new, IDfile);
 
     /* clean up */
-
-    DNS2_remove_dir(sgridoutdir_previous);
+    SGRID_system2("rm -rf", sgridoutdir_previous);
     if(!keep_sgrid_output)
-    DNS2_remove_dir(sgridoutdir);
+        SGRID_system2("rm -rf", sgridoutdir);
   }
   else
   {
-    printf("DNS1_dataReader: Skipping interpolator, reading data from %s\n", IDfile);
+    printf("Skipping interpolator, reading data from %s\n", IDfile);
   }
 
   /* info about filenames */
-  printf("DNS1_dataReader: gridfile = %s\n", gridfile);
-  printf("DNS1_dataReader: IDfile = %s\n", IDfile);
+  printf("DNSdataReader:\n");
+  printf("  gridfile = %s\n", gridfile);
+  printf("  IDfile = %s\n", IDfile);
   fflush(stdout);
 
   /* read ADM variables from files generated by the interpolator */
   fp2 = fopen(IDfile, "rb");
-  if(fp2==NULL) DNS2_errorexits("could not open %s", IDfile);
+  if(fp2==NULL) SGRID_errorexits("could not open %s", IDfile);
   ndata = 20;
-  j=DNS1_position_fileptr_after_str(fp2, "$BEGIN_data:\n");
-  if(j==EOF) DNS2_errorexits("could not find $BEGIN_data: in %s", IDfile);
+  j=DNS_position_fileptr_after_str(fp2, "$BEGIN_data:\n");
+  if(j==EOF) SGRID_errorexits("could not find $BEGIN_data: in %s", IDfile);
   /* go over all points */
   for(i=0; i<npoints; i++)
   {
@@ -304,7 +346,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     VRx = dataline[j];  j++;
     VRy = dataline[j];  j++;
     VRz = dataline[j];  j++;
-    if(j!=n) DNS2_errorexits("error reading dataline from %s", IDfile);
+    if(j!=n) SGRID_errorexits("error reading dataline from %s", IDfile);
 
     /* transform some tensor components, if we have a 180 degree rotation */
     betax[i] *= s180;
@@ -325,7 +367,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
         double xix,xiy,xiz;
         double DNS_n, DNS_kappa, DNS_k, hmk;
 
-        DNS1_select_polytrope_n_kappa_k_of_hm1(q, &DNS_n, &DNS_kappa, &DNS_k);
+        DNS_select_polytrope_n_kappa_k_of_hm1(q, &DNS_n, &DNS_kappa, &DNS_k);
         hmk = q + (1.0 - DNS_k);  /* hmk = hm1 + 1 - k , hm1 = q*/
         rho[i] = pow(hmk/(DNS_kappa*(DNS_n+1.0)), DNS_n);
         press[i]   = rho[i] * hmk/((DNS_n)+1.0);
@@ -359,22 +401,22 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
     /* print g_ij, K_ij, beta^i, alpha */
     if(pr)
     {
-      printf("DNS1_dataReader: (x,y,z)=(%g,%g,%g)\n", x[i],y[i],z[i]);
+      printf("(x,y,z)=(%g,%g,%g)\n", x[i],y[i],z[i]);
 
-      printf("DNS1_dataReader: alpha=%g beta=%g %g %g\n",
+      printf("alpha=%g beta=%g %g %g\n",
 	alp[i], betax[i], betay[i], betaz[i]);  
 
-      printf("DNS1_dataReader: g=%g %g %g %g %g %g \n",
+      printf("g=%g %g %g %g %g %g \n", 
 	gxx[i], gxy[i], gxz[i], gyy[i], gyz[i], gzz[i]);
     
-      printf("DNS1_dataReader: k=%g %g %g %g %g %g\n",
+      printf("k=%g %g %g %g %g %g\n",
 	kxx[i], kxy[i], kxz[i], kyy[i], kyz[i], kzz[i]);
 
-      printf("DNS1_dataReader: rho=%g p=%g epsl=%g v=%g %g %g\n",
+      printf("rho=%g p=%g epsl=%g v=%g %g %g\n",
         rho[i], press[i], eps[i],
         matter_vx[i], matter_vy[i], matter_vz[i]);
 
-      printf("DNS1_dataReader: \n");
+      printf("\n");
     }
     /* check if data makes sense */
     detg=(2.*gxy[i]*gxz[i]*gyz[i] + gxx[i]*gyy[i]*gzz[i] -
@@ -383,7 +425,7 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
 
     if(detg<=0)
     {
-      printf("DNS1_dataReader: det(g_ij)=%g at ccc=i=%d:  x=%g y=%g z=%g\n",
+      printf("det(g_ij)=%g at ccc=i=%d:  x=%g y=%g z=%g\n", 
              detg, i, x[i], y[i], z[i]);
        //errorexit("found a point with det(g_ij)<=0.");
     }
@@ -393,18 +435,16 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
   {
     if(set_dtlapse)
     {
-      printf("DNS1_dataReader: <CCTK_INFO> was called for output \n");
       CCTK_INFO("Setting time derivatives of lapse");
-      DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, alp, dtalp, Omega);
+      DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, alp, dtalp, Omega);
     }
 
     if(set_dtshift)
     {
-      printf("DNS1_dataReader: <CCTK_INFO> was called for output \n");
       CCTK_INFO("Setting time derivatives of shift");
-      DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betax, dtbetax, Omega);
-      DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betay, dtbetay, Omega);
-      DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betaz, dtbetaz, Omega);
+      DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betax, dtbetax, Omega);
+      DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betay, dtbetay, Omega);
+      DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_PASS_CTOC, betaz, dtbetaz, Omega);
     }
   }
 
@@ -427,12 +467,10 @@ void DNS1_dataReader(CCTK_ARGUMENTS)
 
   /* increase level_l counter */
   level_l++;
-    
-//  printf("DNS1_dataReader: done_02 \n");
 }
 
 /* get DNSdata pars */
-void DNS1_dataPars(CCTK_ARGUMENTS)
+void DNSdataPars(CCTK_ARGUMENTS)
 {
   DECLARE_CCTK_ARGUMENTS; 
   DECLARE_CCTK_PARAMETERS;
@@ -443,26 +481,28 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
   double ret;
   int i, j, count, start; 
 
-  CCTK_INFO ("DNS1_dataPars: Reading pars for DNS initial data");
+  CCTK_INFO ("DNSdataPars: Reading pars for DNS initial data");
 
   /* get DNSdataReader_sgrid_datadir and remove any trailing / */
+  //snprintf(datadir, STRLEN-1, "%s", Gets("DNSdataReader_sgrid_datadir"));
   snprintf(datadir, STRLEN-1, "%s", sgrid_datadir);
   j = strlen(datadir);
   if(datadir[j-1]=='/')
   { 
     datadir[j-1]=0;
+    //Sets("DNSdataReader_sgrid_datadir", datadir);
     ret=CCTK_ParameterSet(sgrid_datadir, "DNSdata", datadir);
-    if(ret!=0) printf("DNS1_dataPars: CCTK_ParameterSet returned non-zero exit code!\n");
+    if(ret!=0) printf("CCTK_ParameterSet returned non-zero exit code!\n");
   }
   strcat(datadir, "/BNSdata_properties.txt");
 
   /* open file */
   fp1 = fopen(datadir, "r");
-  if(fp1==NULL) DNS2_errorexits("could not open %s", datadir);
+  if(fp1==NULL) SGRID_errorexits("could not open %s", datadir);
 
   /* move fp1 to place where time = 0 is */
-  j=DNS1_position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
-  if(j==EOF) DNS2_errorexits("could not find (time = 0) in %s", datadir);
+  j=DNS_position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
+  if(j==EOF) SGRID_errorexits("could not find (time = 0) in %s", datadir);
 
   /* initialize pwp, set everything to default */  
   for(i=0; i<MAXPIECES; i++) 
@@ -474,13 +514,13 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
   }  
 
   /* get pars from file */
-  fgotonext(fp1, "n_list"); 
-  fscanline(fp1, strn);
+  SGRID_fgotonext(fp1, "n_list"); 
+  SGRID_fscanline(fp1, strn);
 
-  fgotonext(fp1, "rho0_list");
-  fscanline(fp1, strrho0);
+  SGRID_fgotonext(fp1, "rho0_list");
+  SGRID_fscanline(fp1, strrho0);
 
-  fgetparameter(fp1, "kappa", str);
+  SGRID_fgetparameter(fp1, "kappa", str);
   DNS_EoS_kappa[0] = atof(str);
 
   /* process string with n_list */
@@ -496,16 +536,16 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
 
   if(DNS_EoS_n_pieces == 1)
   {
-    printf("DNS1_dataPars: Only 1 entry in n_list  ->  single polytrope\n");
-    printf("DNS1_dataPars: rho0_list %s\n", strrho0);
+    printf("Only 1 entry in n_list  ->  single polytrope\n");
+    printf("rho0_list %s\n", strrho0);
   }
   else
   {
-    printf("DNS1_dataPars: pwp with %d pieces\n", DNS_EoS_n_pieces);
+    printf("pwp with %d pieces\n", DNS_EoS_n_pieces);
     /* process string with rho0_list */
     start = 1;
     /* use count=1 here, because DNS_EoS_rho0[1] is now the first entry
-       in rho0_list of DNSdata_properties.txt */
+       in rho0_list of BNSdata_properties.txt */
     count = 1; 
     while(sscanf(strrho0+start, "%s", str)==1)
     {
@@ -541,53 +581,65 @@ void DNS1_dataPars(CCTK_ARGUMENTS)
   DNS_EoS_k[DNS_EoS_n_pieces]     = DNS_EoS_k[(DNS_EoS_n_pieces-1)];
 
   /* get rest of sgrid pars */
-  fgetparameter(fp1, "x_CM", str);
+  SGRID_fgetparameter(fp1, "x_CM", str);
   sgrid_x_CM = atof(str);
-  fgetparameter(fp1, "Omega", str);
+  SGRID_fgetparameter(fp1, "Omega", str);
   Omega = atof(str);
-  fgetparameter(fp1, "ecc", str);
+  SGRID_fgetparameter(fp1, "ecc", str);
   ecc = atof(str);
-  fgetparameter(fp1, "rdot", str);
+  SGRID_fgetparameter(fp1, "rdot", str);
   rdot = atof(str);
-  fgetparameter(fp1, "m01", str);
+  SGRID_fgetparameter(fp1, "m01", str);
   m01 = atof(str);
-  fgetparameter(fp1, "m02", str);
+  SGRID_fgetparameter(fp1, "m02", str);
   m02 = atof(str);
   /* shift xmax1/2 such that CM is at 0 */
-  fgetparameter(fp1, "xmax1", str);
+  SGRID_fgetparameter(fp1, "xmax1", str);
   xmax1 = atof(str)-sgrid_x_CM;
-  fgetparameter(fp1, "xmax2", str);
+  SGRID_fgetparameter(fp1, "xmax2", str);
   xmax2 = atof(str)-sgrid_x_CM;
 
   /* close file */
   fclose(fp1);
 
   /* info */
-  printf("DNS1_dataPars: assuming q:=h-1\n");
-  printf("DNS1_dataPars: Use pwp with %d pieces \n", DNS_EoS_n_pieces);
-  printf("DNS1_dataPars: rho0            q           P           kappa          n           k \n");
+  printf("DNSdataPars:\n");
+  printf("assuming q:=h-1\n");
+
+  printf("Use pwp with %d pieces \n", DNS_EoS_n_pieces);
+  printf("rho0            q           P           kappa          n           k \n");  	
   for(i=0;i<=DNS_EoS_n_pieces;i++)
   {
-    printf("DNS1_dataPars: %e %e %e %e %e %e \n",
+    printf("%e %e %e %e %e %e \n", 
     DNS_EoS_rho0[i], DNS_EoS_q[i], DNS_EoS_P[i], DNS_EoS_kappa[i], DNS_EoS_n[i], DNS_EoS_k[i]);
   }
-  printf("DNS1_dataPars: Omega = %g\n", Omega);
-  printf("DNS1_dataPars: ecc = %g\n", ecc);
-  printf("DNS1_dataPars: rdot = %g\n", rdot);
-  printf("DNS1_dataPars: m01 = %g\n", m01);
-  printf("DNS1_dataPars: m02 = %g\n", m02);
-  printf("DNS1_dataPars: xmax1 - sgrid_x_CM = %g\n", xmax1);
-  printf("DNS1_dataPars: xmax2 - sgrid_x_CM = %g\n", xmax2);
-  printf("DNS1_dataPars: sgrid_x_CM = %g\n", sgrid_x_CM);
+  printf("Omega = %g\n", Omega);
+  printf("ecc = %g\n", ecc);
+  printf("rdot = %g\n", rdot);
+  printf("m01 = %g\n", m01);
+  printf("m02 = %g\n", m02);
+  printf("xmax1 - sgrid_x_CM = %g\n", xmax1);
+  printf("xmax2 - sgrid_x_CM = %g\n", xmax2);
+  printf("sgrid_x_CM = %g\n", sgrid_x_CM);
+
+  /* Here we could set some carpet pars that control the grid: */
+  ///* set some pars relevant for setting up bam's grid */
+  //printf("Setting some pars relevant for setting up bam's grid:\n");
+  //Setd("mass1", m01);
+  //Setd("mass2", m02);
+  //Setd("px1", xmax1);
+  //Setd("px2", xmax2);
+  //printf("mass1 = %g\n", Gets("mass1"));
+  //printf("mass2 = %g\n", Gets("mass2"));    
+  //printf("bhx1 = %g\n", Gets("px1"));
+  //printf("bhx2 = %g\n", Gets("px2"));    
 
   /* init level_l counter */
   level_l = 0;
-  
-//  printf("DNS1_dataPars: done_03 \n");
 }
 
 /* select pwp pars */
-void DNS1_select_polytrope_n_kappa_k_of_hm1(double hm1,
+void DNS_select_polytrope_n_kappa_k_of_hm1(double hm1,
                                            double *n, double *kappa, double *k)
 {
   int m;
@@ -598,14 +650,13 @@ void DNS1_select_polytrope_n_kappa_k_of_hm1(double hm1,
   *n     = DNS_EoS_n[m];
   *kappa = DNS_EoS_kappa[m];
   *k     = DNS_EoS_k[m];
-//  printf("DNS1_select_polytrope_n_kappa_k_of_hm1: done_04 \n");
 }
 
 
 /* Calculate the time deriv of a grid var in the inertial frame from it's
    spatial derivs assuming a helical Killing vector.
    The way it's done below should work for scalars. */
-void DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
+void DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
                                               CCTK_REAL *var, CCTK_REAL *dtvar,
                                               CCTK_REAL Omega)
 {
@@ -633,6 +684,22 @@ void DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
   /* free derivs */
   free(dyvar);
   free(dxvar);
+}
+
+ int DNS_run(const char *command)
+ {
+  char *com = strdup(command); /* duplicate since construct_argv modifies its args */
+  int ret, status;
+
+  printf("SGRID_run: running command:\n%s\n", command);
+  char **argv;
+  SGRID_construct_argv(com, &argv);
+  ret = libsgrid_main(6, argv);
+//  ret = libsgrid_main(argv[0], argv);
+
+  status = ret;
+  if(status!=0) printf("SGRID_run: -> WARNING: Return value = %d\n", status);
+  free(com);
     
-//  printf("DNS1_set_TimeDeriv_in_inertFrame_assuming_HKV: done_05 \n");
+  return status;
 }
