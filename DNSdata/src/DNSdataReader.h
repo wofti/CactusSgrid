@@ -9,7 +9,7 @@ void DNS_select_polytrope_n_kappa_k_of_hm1(double hm1,
 void DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
                                               CCTK_REAL *var, CCTK_REAL *dtvar,
                                               CCTK_REAL Omega);
-int DNS_run(const char *command);
+int DNS_call_sgrid(const char *command);
 
 int libsgrid_main(int argc, char **argv);
 

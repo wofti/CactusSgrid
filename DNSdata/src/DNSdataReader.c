@@ -239,8 +239,8 @@ void DNSdataReader(CCTK_ARGUMENTS)
     if(!keep_sgrid_output)
       strcat(call_interpolator, " > /dev/null");
     fflush(stdout);
-    ret = DNS_run(call_interpolator);
-    printf("DNSdataReader: SGRID_run returned: %d\n", ret);
+    ret = DNS_call_sgrid(call_interpolator);
+    printf("DNSdataReader: DNS_call_sgrid returned: %d\n", ret);
     fflush(stdout);
     if(ret)
     {
@@ -268,7 +268,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
                sgridallargsfile, MPIrank);
       fprintf(fp1, "%s%s", sgridargs, "\n");
       fclose(fp1);
-      /* errorexit("interpolator returned non-zero exit code!"); */
+      /* SGRID_errorexit("interpolator returned non-zero exit code!"); */
       printf("interpolator returned non-zero exit code: %d\n", ret);
       fflush(stdout);
       // FIXME: need CCTK function that returns number of last level
@@ -427,7 +427,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
     {
       printf("det(g_ij)=%g at ccc=i=%d:  x=%g y=%g z=%g\n", 
              detg, i, x[i], y[i], z[i]);
-       //errorexit("found a point with det(g_ij)<=0.");
+       //SGRID_errorexit("found a point with det(g_ij)<=0.");
     }
   } /* end of all points loop */
 
@@ -686,19 +686,23 @@ void DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
   free(dxvar);
 }
 
- int DNS_run(const char *command)
- {
+
+/* function to call libsgrid_main */
+int DNS_call_sgrid(const char *command)
+{
   char *com = strdup(command); /* duplicate since construct_argv modifies its args */
-  int ret, status;
-
-  printf("SGRID_run: running command:\n%s\n", command);
   char **argv;
-  SGRID_construct_argv(com, &argv);
-  ret = libsgrid_main(6, argv);
-//  ret = libsgrid_main(argv[0], argv);
+  int argc, status;
 
-  status = ret;
-  if(status!=0) printf("SGRID_run: -> WARNING: Return value = %d\n", status);
+  printf("DNS_call_sgrid: calling libsgrid_main with these arguments:\n%s\n",
+         command);
+
+  argc = SGRID_construct_argv(com, &argv);
+  status = libsgrid_main(argc, argv);
+  if(status!=0)
+    printf("DNS_call_sgrid: -> WARNING: Return value = %d\n", status);
+
+  free(argv); /* free since construct_argv allocates argv */
   free(com);
     
   return status;
