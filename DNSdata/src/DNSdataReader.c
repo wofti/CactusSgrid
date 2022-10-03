@@ -75,9 +75,9 @@ void DNSdataReader(CCTK_ARGUMENTS)
   int ndata = NDATAMAX;
   double xb, yb, zb;
   FILE *fp1, *fp2;
-  char gridfile[STRLEN], call_interpolator[STRLEN], IDfile[STRLEN];
+  char gridfile[STRLEN], call_interpolator[STRLEN+65676], IDfile[STRLEN];
   char sgridoutdir[STRLEN], sgridoutdir_previous[STRLEN];
-  char sgridcheckpoint_indir[STRLEN], IDfile_new[STRLEN];
+  char sgridcheckpoint_indir[STRLEN], IDfile_new[STRLEN+4];
   char sgridparfile[STRLEN];
   char *sgridargs;
   char *stringptr;
