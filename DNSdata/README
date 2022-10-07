@@ -5,15 +5,35 @@ License      : GPL
 
 --------------------------------------------------------------------------
 
-1. Purpose
+1. Purpose.
 
-Import Sgrid's DNSdata, which is binary neutron star initial data.
+This thorn allows one to use Sgrid-generated initial data (ID) of the Binary Neutron Star (BNS) as a starting point for the Cactus simulation.
 
-2. How it works
+2. How does it works?
 
-In order to interpolate Sgrid's DNSdata onto the grid of Cactus, one needs a Sgrid numerical code to be compiled as a library. This library must be linked during the Cactus compilation. The procedure is described in an accompanying REDME.md file in points 2. and 3. which say:
+In order to make Sgrid-generated ID usable for Cactus, Sgrid must become a part of the Cactus compilation and interpolate it's initial data according to Cactus numerical grid. In practice, it requires "two steps" communication: Cactus <---> DNSdata <---> Sgrid. This thorn is this intermediate step. After the first stage of the run, when the Sgrid interpolation is completed, the second stage belongs solely to Cactus and is independent on the choice of ID delivery.
 
-*********** an extract from REDME.md ***********
+3. How to do it in practice?
+
+In the directory "useful_files" we provide a complete packet of files and the script "prepare_DNSdata.sh" which can prepare (almost) entire setup (almost) automatically. You can stop reading here and try to do it on your own or you can go to "useful_files" directory, and simply execute the script. Reading "useful_files/read README.md" may help to understand it better.
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!                                                                                      !!!
+!!                                                                                        !!
+!           YOU MAY STOP READING HERE AND SWITCH TO "useful_files/read README.md"          !
+!!                                                                                        !!
+!!!                                                                                      !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!   For thous who want to do it by themselves, we provide some further explanations.   !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+3a. DNSdata thorn requires Sgrid to be compiled as a library and calls this library forcing Sgrid to start an interpolation. The procedure is described in above-mentioned "useful_files/REDME.md" in points 2&3 and says:
+
+*********** an extract from useful_files/REDME.md ***********
 *
 *   2. Set the right path to the Sgrid library in your dns.cfg file. It probably supposed to be
 *   "LIBDIRS = path_to_this_project/sgrid/lib", and then the library itself:
@@ -23,22 +43,25 @@ In order to interpolate Sgrid's DNSdata onto the grid of Cactus, one needs a Sgr
 *   "./simfactory/bin/sim setup-silent"
 *   "./simfactory/bin/sim build -j12 --thornlist ../dns.th --optionlist ../dns.cfg"
 *
-***********************************************
+**************************************************************
 
-In order to read Sgrid-generated initial data and make them ready for interpolation, the correct path to the ID directory must be provided. The procedure is described in an accompanying REDME.md file in point 4. which says:
+3b. In order to read Sgrid-generated initial data and make them ready for interpolation, the correct path to the ID directory must be provided. The procedure is described in above-mentioned "useful_files/REDME.md" in point 4 and says:
 
-*********** an extract from REDME.md ***********
+*********** an extract from useful_files/REDME.md ***********
 *
 *   4. Set the right path to the Sgrid-generated initial data directory in dns.par file:
 *   "DNSdata::sgrid_datadir = "path_to_ID_directory" ",
 *   and then build the skeleton of the run by typing:
 *   "./simfactory/bin/sim create-run name_of_the_run --parfile ../dns.par"
 *
-***********************************************
+**************************************************************
 
-It is worth to mention that the standard sgrid ID packet contains a file, BNSdata_properties.txt. This file is useful to get to know about the model's parameters. Some of them are required by cactus and should be correctly passed to it by setting them in .par file. Among others there are:
+4. It is worth to mention that the standard Sgrid ID packet contains at least three files:
+a)"checkpoint.0"			- contains most of the information, 
+b)"xxx.par"			- it is Sgrid .par file. IMPORTANT COMMENT: It may require some changes with respect to the version which was used to run Sgrid in the first place (to generate an initial data).
+c)"BNSdata_properties.txt"	- contains an essential system characteristics and serves as some kind of summary of the model. Since some system characteristic are required by Cactus and should be correctly set in Cactus' .par file, it is recommended to get familiar with this file. Among others there are:
 
-a) The center of the grid box in Cactus, "CarpetRegrid2::position_x_1" should correspond to the NS's density maximum, "xmax1" in Cactus-genereted "BNSdata_properties.txt",
+a) The center of the grid box in Cactus, "CarpetRegrid2::position_x_1" should correspond to the NS's density maximum, "xmax1" in Sgrid-genereted "BNSdata_properties.txt". WARNING here: Sgrid locates the origin of the coordinate system in a half-distance between the binary, whereas Cactus locates the origin of the coordinate system at the center of mass of the binary. In case is not equal mass binary, the user must take care about it.
 b) The parameters related to the choice of the equation of state, "EOS_Omni::poly_K", xxx, yyy, should correspond to the Sgrid's eos parameters listed as: "n_list", "rho0_list", and "kappa" in Cactus-genereted "BNSdata_properties.txt".
 
 One also needs to specify things like:
