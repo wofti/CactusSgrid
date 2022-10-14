@@ -11,7 +11,10 @@ void DNS_set_TimeDeriv_in_inertFrame_assuming_HKV(CCTK_ARGUMENTS,
                                               CCTK_REAL Omega);
 int DNS_call_sgrid(const char *command);
 
+/* functions and variables from sgrid */
 int libsgrid_main(int argc, char **argv);
+extern int SGRID_memory_persists;
+int SGRID_grid_exists(void);
 
 void SGRID_errorexits(char *file, int line, char *s, char *t);
 #define SGRID_errorexits(s,t) SGRID_errorexits(__FILE__, __LINE__, (s), (t))
@@ -19,7 +22,6 @@ void SGRID_errorexits(char *file, int line, char *s, char *t);
 int SGRID_system2(char *s1, char *s2);
 int SGRID_lock_curr_til_EOF(FILE *out);
 int SGRID_construct_argv(char *str, char ***argv);
-
 
 int SGRID_fgotonext(FILE *in, const char *label);
 int SGRID_fgetparameter(FILE *in, const char *par, char *str);
@@ -32,3 +34,7 @@ int SGRID_pfind_before_after(const char *str,int p,char *before,char *after,cons
 int SGRID_sscan_word_at_p(const char *str, int p, char *word);
 int SGRID_fscan_str_using_getc(FILE *in, char *str);
 int SGRID_fscanf1(FILE *in, char *fmt, char *str);
+
+void SGRID_EoS_T0_rho0_P_rhoE_from_hm1(double hm1,
+                                       double *rho0, double *P, double *rhoE);
+double SGRID_epsl_of_rho0_rhoE(double rho0, double rhoE);
