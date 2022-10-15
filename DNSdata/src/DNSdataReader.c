@@ -232,8 +232,8 @@ void DNSdataReader(CCTK_ARGUMENTS)
             sgrid_exe, sgrid_datadir, sgridparfile,
             gridfile, IDfile_new, sgridoutdir, sgridcheckpoint_indir);
     strcat(call_interpolator,
-           "--modify-par:verbose=no "
-           "--modify-par:Coordinates_verbose=no");
+           " --modify-par:verbose=no"
+           " --modify-par:Coordinates_verbose=no");
     if(Interpolate_verbose)
       strcat(call_interpolator, " --modify-par:BNSdata_Interpolate_verbose=yes");
     if(Interpolate_max_xyz_diff>0.0)
@@ -331,8 +331,8 @@ void DNSdataReader(CCTK_ARGUMENTS)
             "*** NONE ***", IDfile_new, sgridoutdir, sgridcheckpoint_indir);
     /* low verbosity */
     strcat(call_interpolator,
-           "--modify-par:verbose=no "
-           "--modify-par:Coordinates_verbose=no");
+           " --modify-par:verbose=no"
+           " --modify-par:Coordinates_verbose=no");
     ret = DNS_call_sgrid(call_interpolator);
     printf("DNSdataReader: DNS_call_sgrid returned: %d\n", ret);
   }
