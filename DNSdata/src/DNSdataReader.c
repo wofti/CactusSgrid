@@ -516,7 +516,8 @@ void DNSdataPars(CCTK_ARGUMENTS)
   DECLARE_CCTK_PARAMETERS;
   FILE *fp1;
   char str[STRLEN];
-  char strn[STRLEN], strrho0[STRLEN];
+  char strn[STRLEN], strrho0[STRLEN], strkappa[STRLEN];
+  char EoS_type[STRLEN], EoS_file[STRLEN];
   char datadir[STRLEN];
   double ret;
   int i, j, count, start; 
@@ -545,7 +546,6 @@ void DNSdataPars(CCTK_ARGUMENTS)
   if(j==EOF) SGRID_errorexits("could not find (time = 0) in %s", datadir);
 
   //FIXME: remove DNS_EoS stuff below, since we can now call sgrid funcs
-
   /* initialize pwp, set everything to default */  
   for(i=0; i<MAXPIECES; i++) 
   {
@@ -556,15 +556,44 @@ void DNSdataPars(CCTK_ARGUMENTS)
   }  
 
   /* get pars from file */
-  SGRID_fgotonext(fp1, "n_list"); 
-  SGRID_fscanline(fp1, strn);
+  ret = SGRID_fgetparameter(fp1, "EoS_type", EoS_type);
+  if(ret==EOF)
+  {
+    /* if we can't find EoS_type default to PwP */
+    sprintf(EoS_type, "%s", "PwP");
+    rewind(fp1);
+    j=DNS_position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
+  }
 
-  SGRID_fgotonext(fp1, "rho0_list");
-  SGRID_fscanline(fp1, strrho0);
+  /* check if we need to read piecewise poly (PwP) pars */
+  if(strcmp(EoS_type,"PwP")==0)
+  {
+    SGRID_fgotonext(fp1, "n_list"); 
+    SGRID_fscanline(fp1, strn);
 
-  SGRID_fgetparameter(fp1, "kappa", str);
-  DNS_EoS_kappa[0] = atof(str);
+    SGRID_fgotonext(fp1, "rho0_list");
+    SGRID_fscanline(fp1, strrho0);
 
+    SGRID_fgetparameter(fp1, "kappa", strkappa);
+    DNS_EoS_kappa[0] = atof(strkappa);
+
+    printf("initial data uses PwP EoS with:\n");
+    printf("n_list    = %s\n", strn);
+    printf("rho0_list = %s\n", strrho0);
+    printf("kappa     = %s\n", strkappa);
+    printf("Note: n_list contains the polytropic index n,\n"
+           "      compute each Gamma using:  Gamma = 1 + 1/n\n");
+  }
+  /* check if EoS is in sgrid table */
+  if(strcmp(EoS_type,"tab1d_AtT0")==0)
+  {
+    SGRID_fgetparameter(fp1, "EoS_file", EoS_file);
+    printf("initial data uses T=0 EoS table:\n");
+    printf("EoS_file = %s\n", EoS_file);
+  }
+  printf("Make sure you use a compatible EoS in Cactus!!!\n");
+
+  //FIXME: remove DNS_EoS stuff below, since we can now call sgrid funcs
   /* process string with n_list */
   start = 2;   count = 0;
   while(sscanf(strn+start, "%s", str)==1)
@@ -660,9 +689,10 @@ void DNSdataPars(CCTK_ARGUMENTS)
   printf("rdot = %g\n", rdot);
   printf("m01 = %g\n", m01);
   printf("m02 = %g\n", m02);
+  printf("sgrid_x_CM = %g\n", sgrid_x_CM);
   printf("xmax1 - sgrid_x_CM = %g\n", xmax1);
   printf("xmax2 - sgrid_x_CM = %g\n", xmax2);
-  printf("sgrid_x_CM = %g\n", sgrid_x_CM);
+  printf("Make sure to center the Cactus grid on the latter two!!!\n");
 
   /* Here we could set some carpet pars that control the grid: */
   ///* set some pars relevant for setting up bam's grid */
