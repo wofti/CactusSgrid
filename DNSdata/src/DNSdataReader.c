@@ -557,6 +557,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
 
   /* get pars from file */
   ret = SGRID_fgetparameter(fp1, "EoS_type", EoS_type);
+  printf("ret=%d -> EoS_type = %s\n", ret, EoS_type);
   if(ret==EOF)
   {
     /* if we can't find EoS_type default to PwP */
@@ -564,6 +565,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
     rewind(fp1);
     j=DNS_position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
   }
+  printf("EoS_type = %s\n", EoS_type);
 
   /* check if we need to read piecewise poly (PwP) pars */
   if(strcmp(EoS_type,"PwP")==0)
