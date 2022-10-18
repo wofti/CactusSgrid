@@ -557,7 +557,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
 
   /* get pars from file */
   ret = SGRID_fgetparameter(fp1, "EoS_type", EoS_type);
-  printf("ret=%d -> EoS_type = %s\n", ret, EoS_type);
+  //printf("ret=%d -> EoS_type = %s\n", ret, EoS_type);
   if(ret==EOF)
   {
     /* if we can't find EoS_type default to PwP */
@@ -568,7 +568,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
   printf("EoS_type = %s\n", EoS_type);
 
   /* check if we need to read piecewise poly (PwP) pars */
-  if(strcmp(EoS_type,"PwP")==0)
+  if( (strcmp(EoS_type,"PwP")==0) || (strcmp(EoS_type,"pwp")==0) )
   {
     SGRID_fgotonext(fp1, "n_list"); 
     SGRID_fscanline(fp1, strn);
@@ -583,7 +583,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
     printf("n_list    = %s\n", strn);
     printf("rho0_list = %s\n", strrho0);
     printf("kappa     = %s\n", strkappa);
-    printf("Note: n_list contains the polytropic index n,\n"
+    printf("Note: n_list contains the polytropic indices n,\n"
            "      compute each Gamma using:  Gamma = 1 + 1/n\n");
   }
   /* check if EoS is in sgrid table */
