@@ -328,7 +328,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
             "--modify-par:outdir=%s "
             "--modify-par:checkpoint_indir=%s",
             sgrid_exe, sgrid_datadir, sgridparfile,
-            "****NONE****", IDfile_new, sgridoutdir, sgridcheckpoint_indir);
+            "****NONE****", "<NONE>", sgridoutdir, sgridcheckpoint_indir);
     /* low verbosity */
     strcat(call_interpolator,
            " --modify-par:verbose=no"
