@@ -18,17 +18,6 @@
 
 #define NDATAMAX 23
 #define STRLEN 16384
-#define MAXPIECES 10
-
-// FIXME: remove all EoS vars and funcs
-/* stuff for pwp */
-int    DNS_EoS_n_pieces;
-double DNS_EoS_rho0[MAXPIECES];
-double DNS_EoS_kappa[MAXPIECES];
-double DNS_EoS_n[MAXPIECES];
-double DNS_EoS_k[MAXPIECES];
-double DNS_EoS_q[MAXPIECES];
-double DNS_EoS_P[MAXPIECES];
 
 /* global vars that are set to sgrid pars */
 double sgrid_x_CM; // sgrid's CM of system"
@@ -232,6 +221,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
             sgrid_exe, sgrid_datadir, sgridparfile,
             gridfile, IDfile_new, sgridoutdir, sgridcheckpoint_indir);
     strcat(call_interpolator,
+           " --modify-par:Coordinates_set_bfaces=no"
            " --modify-par:verbose=no"
            " --modify-par:Coordinates_verbose=no");
     if(Interpolate_verbose)
@@ -331,6 +321,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
             "****NONE****", "<NONE>", sgridoutdir, sgridcheckpoint_indir);
     /* low verbosity */
     strcat(call_interpolator,
+           " --modify-par:Coordinates_set_bfaces=no"
            " --modify-par:verbose=no"
            " --modify-par:Coordinates_verbose=no");
     ret = DNS_call_sgrid(call_interpolator);
@@ -395,14 +386,6 @@ void DNSdataReader(CCTK_ARGUMENTS)
         double vIx,vIy,vIz;
         double xix,xiy,xiz;
         double rho0, P, rhoE;
-
-        //FIXME: remove these comments:
-        //double DNS_n, DNS_kappa, DNS_k, hmk;
-        //DNS_select_polytrope_n_kappa_k_of_hm1(q, &DNS_n, &DNS_kappa, &DNS_k);
-        //hmk = q + (1.0 - DNS_k);  /* hmk = hm1 + 1 - k , hm1 = q*/
-        //rho[i] = pow(hmk/(DNS_kappa*(DNS_n+1.0)), DNS_n);
-        //press[i]   = rho[i] * hmk/((DNS_n)+1.0);
-        //eps[i]= q - press[i]/rho[i];
 
         /* call sgrid funcs to set rho, press, eps */
         SGRID_EoS_T0_rho0_P_rhoE_from_hm1(q, &rho0, &P, &rhoE);
@@ -544,17 +527,7 @@ void DNSdataPars(CCTK_ARGUMENTS)
   /* move fp1 to place where time = 0 is */
   j=DNS_position_fileptr_after_str(fp1, "NS data properties (time = 0):\n");
   if(j==EOF) SGRID_errorexits("could not find (time = 0) in %s", datadir);
-
-  //FIXME: remove DNS_EoS stuff below, since we can now call sgrid funcs
-  /* initialize pwp, set everything to default */  
-  for(i=0; i<MAXPIECES; i++) 
-  {
-    DNS_EoS_rho0[i]    = 0;
-    DNS_EoS_kappa[i]   = 0;
-    DNS_EoS_n[i]       = 0;
-    DNS_EoS_k[0]       = 1.;
-  }  
-
+  
   /* get pars from file */
   ret = SGRID_fgetparameter(fp1, "EoS_type", EoS_type);
   //printf("ret=%d -> EoS_type = %s\n", ret, EoS_type);
@@ -577,7 +550,6 @@ void DNSdataPars(CCTK_ARGUMENTS)
     SGRID_fscanline(fp1, strrho0);
 
     SGRID_fgetparameter(fp1, "kappa", strkappa);
-    DNS_EoS_kappa[0] = atof(strkappa);
 
     printf("initial data uses PwP EoS with:\n");
     printf("n_list    = %s\n", strn);
@@ -594,64 +566,6 @@ void DNSdataPars(CCTK_ARGUMENTS)
     printf("EoS_file = %s\n", EoS_file);
   }
   printf("Make sure you use a compatible EoS in Cactus!!!\n");
-
-  //FIXME: remove DNS_EoS stuff below, since we can now call sgrid funcs
-  /* process string with n_list */
-  start = 2;   count = 0;
-  while(sscanf(strn+start, "%s", str)==1)
-  {
-    start += strlen(str);
-    if(strn[start]==' ') start++;
-    DNS_EoS_n[count] = atof(str);
-    count=count+1;
-  }
-  DNS_EoS_n_pieces = count;
-
-  if(DNS_EoS_n_pieces == 1)
-  {
-    printf("Only 1 entry in n_list  ->  single polytrope\n");
-    printf("rho0_list %s\n", strrho0);
-  }
-  else
-  {
-    printf("pwp with %d pieces\n", DNS_EoS_n_pieces);
-    /* process string with rho0_list */
-    start = 1;
-    /* use count=1 here, because DNS_EoS_rho0[1] is now the first entry
-       in rho0_list of BNSdata_properties.txt */
-    count = 1; 
-    while(sscanf(strrho0+start, "%s", str)==1)
-    {
-      start += strlen(str);
-      if(strrho0[start]==' ') start++;
-      DNS_EoS_rho0[count] = atof(str);
-      count=count+1;
-    }
-  }
-  /* compute the constant k, k = a+1 according to arXiv:0812.2163*/
-  for(i=0;i<DNS_EoS_n_pieces;i++)
-  {
-    if(i > 0)
-    {  
-      DNS_EoS_kappa[i] = DNS_EoS_kappa[i-1]*pow(DNS_EoS_rho0[i],(DNS_EoS_n[i]-DNS_EoS_n[i-1])/
-                     (DNS_EoS_n[i-1]*DNS_EoS_n[i]));
-
-      DNS_EoS_k[i] = ((DNS_EoS_k[i-1]*DNS_EoS_rho0[i]+DNS_EoS_n[i-1]
-               * DNS_EoS_kappa[i-1]*pow(DNS_EoS_rho0[i],1.+1./DNS_EoS_n[i-1]))/DNS_EoS_rho0[i])
-               - DNS_EoS_kappa[i]*DNS_EoS_n[i]*pow(DNS_EoS_rho0[i],1./DNS_EoS_n[i]);
-    }
-    DNS_EoS_q[i]  = DNS_EoS_k[i] + (DNS_EoS_n[i]+1)*DNS_EoS_kappa[i]*pow(DNS_EoS_rho0[i],1./DNS_EoS_n[i])-1.;
-    DNS_EoS_P[i]  = DNS_EoS_kappa[i]*pow(DNS_EoS_rho0[i],1.+1./(DNS_EoS_n[i]));
-  
-    /* print rho, kappa, n, k in log-file*/ 
-  }
-  /* copy last column and set large end-value*/  
-  DNS_EoS_rho0[DNS_EoS_n_pieces]  = DNS_EoS_rho0[(DNS_EoS_n_pieces-1)] + 1.e10;
-  DNS_EoS_q[DNS_EoS_n_pieces]     = DNS_EoS_q[(DNS_EoS_n_pieces-1)]    + 1.e10;
-  DNS_EoS_P[DNS_EoS_n_pieces]     = DNS_EoS_P[(DNS_EoS_n_pieces-1)]    + 1.e10;
-  DNS_EoS_kappa[DNS_EoS_n_pieces] = DNS_EoS_kappa[(DNS_EoS_n_pieces-1)];
-  DNS_EoS_n[DNS_EoS_n_pieces]     = DNS_EoS_n[(DNS_EoS_n_pieces-1)];
-  DNS_EoS_k[DNS_EoS_n_pieces]     = DNS_EoS_k[(DNS_EoS_n_pieces-1)];
 
   /* get rest of sgrid pars */
   SGRID_fgetparameter(fp1, "x_CM", str);
@@ -677,15 +591,6 @@ void DNSdataPars(CCTK_ARGUMENTS)
 
   /* info */
   printf("DNSdataPars:\n");
-  printf("assuming q:=h-1\n");
-
-  printf("Use pwp with %d pieces \n", DNS_EoS_n_pieces);
-  printf("rho0            q           P           kappa          n           k \n");  	
-  for(i=0;i<=DNS_EoS_n_pieces;i++)
-  {
-    printf("%e %e %e %e %e %e \n", 
-    DNS_EoS_rho0[i], DNS_EoS_q[i], DNS_EoS_P[i], DNS_EoS_kappa[i], DNS_EoS_n[i], DNS_EoS_k[i]);
-  }
   printf("Omega = %g\n", Omega);
   printf("ecc = %g\n", ecc);
   printf("rdot = %g\n", rdot);
@@ -711,21 +616,6 @@ void DNSdataPars(CCTK_ARGUMENTS)
   /* init level_l counter */
   level_l = 0;
 }
-
-/* select pwp pars */
-void DNS_select_polytrope_n_kappa_k_of_hm1(double hm1,
-                                           double *n, double *kappa, double *k)
-{
-  int m;
-  /* find m such that q=hm1<DNS_EoS_q[m+1] */
-  for(m=0; m< DNS_EoS_n_pieces-1; m++)
-    if(hm1 < DNS_EoS_q[m+1]) break;
-  /* Note, if EoS_n_pieces=1 we always get m=0 */
-  *n     = DNS_EoS_n[m];
-  *kappa = DNS_EoS_kappa[m];
-  *k     = DNS_EoS_k[m];
-}
-
 
 /* Calculate the time deriv of a grid var in the inertial frame from it's
    spatial derivs assuming a helical Killing vector.
