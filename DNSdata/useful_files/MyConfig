@@ -41,5 +41,5 @@ OFLAGS = -O3 # -O3 -openmp # -O2 -axT # -O2 # -p -g # -O2 -Wall -pg
 DFLAGS += -DLIBSGRID
 
 # compile in special libraries:
-DFLAGS += -DGSL
-SPECIALLIBS += -lgsl -lgslcblas
+#DFLAGS += -DGSL
+#SPECIALLIBS += -lgsl -lgslcblas
