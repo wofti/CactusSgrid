@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH --job-name=CS_x
-#SBATCH --output=CS_x.out
+#SBATCH --job-name=dns
+#SBATCH --output=dns.out
 
 #SBATCH --partition=shortq7
 #SBATCH --nodes=1
@@ -17,6 +17,6 @@ module load openblas/0.3.7
 module load gsl-2.5-gcc-8.3.0-4sokk4l
 
 ./simfactory/bin/sim setup-silent
-./simfactory/bin/sim build -j12 --thornlist ../dns.th --optionlist ../dns.cfg
+./simfactory/bin/sim build -j24 --thornlist ../dns.th --optionlist ../dns.cfg
 
 # ./simfactory/bin/sim create-run CS_x --parfile ../dns.par

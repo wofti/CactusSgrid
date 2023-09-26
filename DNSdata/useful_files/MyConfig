@@ -6,18 +6,36 @@
 # ------------------------------------------------------------------------
 # here are simple examples for libraries, they may be mutually exclusive
 
-# libs in main part of sgrid
+# black hole evolution
+#libpaths += src/physics/adm
+#libpaths += src/physics/bssn
+#libpaths += src/physics/testwave
+#ibpaths += src/physics/ConvTest
+#libpaths += src/utility/boundary
 libpaths += src/physics/ADMvars
+#libpaths += src/physics/SingleBH
+#libpaths += src/physics/BSSN
+#libpaths += src/physics/Z4secondO
+#libpaths += src/physics/ScalarWave
+#libpaths += src/physics/TestDerivs
+#libpaths += src/physics/Poisson
 libpaths += src/utility/GridIterators
 libpaths += src/utility/LinAlg
+#libpaths += src/physics/ScalarOnKerr
+#libpaths += src/physics/ScalarOnKerr/DV_CircSchwSource
+#libpaths += src/physics/ScalarOnKerr/DV_CircSchwSource2
 libpaths += src/utility/s2kit
+#libpaths += src/physics/TestID
 #libpaths += src/physics/ModeComputer
 #libpaths += src/physics/PN_CircularOrbit_GWs
 
-# libs in src/Projects
 repo = giter@quark.physics.fau.edu:
+#projects += $(repo)/BNSdata
 projects += $(repo)/DNSdata
 projects += $(repo)/EoS_T0
+#projects += $(repo)/RealisticBBH
+#projects += $(repo)/QLMsolver
+#projects += $(repo)/IsometricEmbedding
 
 # ------------------------------------------------------------------------
 # override various options in the Makefile
@@ -37,9 +55,6 @@ CC = gcc
 OFLAGS = -O3 # -O3 -openmp # -O2 -axT # -O2 # -p -g # -O2 -Wall -pg
 
 # ------------------------------------------------------------------------
-# compile libsgrid:
-DFLAGS += -DLIBSGRID
-
 # compile in special libraries:
-#DFLAGS += -DGSL
-#SPECIALLIBS += -lgsl -lgslcblas
+
+DFLAGS += -DLIBSGRID
