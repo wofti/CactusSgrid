@@ -15,10 +15,10 @@ cd $XXX
 #echo 'Sgrid downladed'
 #echo ''
 
-cp ../dns* ./
+cp ../dns.* ./
 curl -kLO https://raw.githubusercontent.com/gridaphobe/CRL/ET_2022_05/GetComponents
 chmod a+x GetComponents
-./GetComponents dnsx.th
+./GetComponents dns.th
 cp ../comp.sh Cactus/
 
 echo ''
