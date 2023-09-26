@@ -1,0 +1,60 @@
+# MyConfig.example
+#
+# The file MyConfig is included verbatim in the Makefile to determine which 
+# special libraries will be included in the build.
+
+# ------------------------------------------------------------------------
+# here are simple examples for libraries, they may be mutually exclusive
+
+# black hole evolution
+#libpaths += src/physics/adm
+#libpaths += src/physics/bssn
+#libpaths += src/physics/testwave
+#ibpaths += src/physics/ConvTest
+#libpaths += src/utility/boundary
+libpaths += src/physics/ADMvars
+#libpaths += src/physics/SingleBH
+#libpaths += src/physics/BSSN
+#libpaths += src/physics/Z4secondO
+#libpaths += src/physics/ScalarWave
+#libpaths += src/physics/TestDerivs
+#libpaths += src/physics/Poisson
+libpaths += src/utility/GridIterators
+libpaths += src/utility/LinAlg
+#libpaths += src/physics/ScalarOnKerr
+#libpaths += src/physics/ScalarOnKerr/DV_CircSchwSource
+#libpaths += src/physics/ScalarOnKerr/DV_CircSchwSource2
+libpaths += src/utility/s2kit
+#libpaths += src/physics/TestID
+#libpaths += src/physics/ModeComputer
+#libpaths += src/physics/PN_CircularOrbit_GWs
+
+repo = giter@quark.physics.fau.edu:
+#projects += $(repo)/BNSdata
+projects += $(repo)/DNSdata
+projects += $(repo)/EoS_T0
+#projects += $(repo)/RealisticBBH
+#projects += $(repo)/QLMsolver
+#projects += $(repo)/IsometricEmbedding
+
+# ------------------------------------------------------------------------
+# override various options in the Makefile
+
+# name and directory for the executable
+EXEC = sgrid
+EXECDIR = $(TOP)/exe
+
+# pick a C compiler, only gcc and icc have been tested, gcc is the default
+CC = gcc
+# pick a C++ compiler, and a compiler to link, e.g. g++
+#CXX =
+#CLINKER = g++  -L/opt/intel/cce/10.1.021/lib -lsvml -limf -lintlc
+#CLINKER = icpc
+
+# optimization flags, say -O, -O2, -g for debugging, -pg for profiling, ...
+OFLAGS = -O3 # -O3 -openmp # -O2 -axT # -O2 # -p -g # -O2 -Wall -pg
+
+# ------------------------------------------------------------------------
+# compile in special libraries:
+
+DFLAGS += -DLIBSGRID
