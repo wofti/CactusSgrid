@@ -9,9 +9,9 @@ License      : GPL
 
 This thorn allows one to use Sgrid-generated initial data (ID) of the Binary Neutron Star (BNS) as a starting point for the Cactus simulation.
 
-2. How does it works?
+2. How does it work?
 
-In order to make Sgrid-generated ID usable for Cactus, Sgrid must become a part of the Cactus compilation and interpolate it's initial data according to Cactus numerical grid. In practice, it requires "two steps" communication: Cactus <---> DNSdata <---> Sgrid. This thorn is this "intermediate step". After the first stage of the run, when the Sgrid interpolation is completed, the second stage belongs solely to Cactus and is independent on the choice of ID delivery.
+In order to make Sgrid-generated ID usable for Cactus, Sgrid must become a part of the Cactus compilation and interpolate its initial data according to Cactus numerical grid. In practice, it requires "two steps" of communication: Cactus <---> DNSdata <---> Sgrid. This thorn is this "intermediate step". After the first stage of the run, when the Sgrid interpolation is completed, the second stage belongs solely to Cactus and is independent on the choice of ID delivery.
 
 3. How to do it in practice?
 
@@ -57,7 +57,7 @@ In the directory "useful_files" we provide a complete packet of files and the sc
 **************************************************************
 
 4. It is worth to mention that the standard Sgrid ID packet is composed of at least three files:
-a)"checkpoint.0"		- contains most of the information, 
+a)"checkpoint.0"		- contains most of the information,
 b)"xxx.par"			- it is Sgrid .par file. IMPORTANT COMMENT: It may require some changes with respect to the version which was used to run Sgrid in the first place (to generate an initial data).
 c)"BNSdata_properties.txt"	- contains an essential system characteristics and serves as some kind of summary of the model. Since some system characteristic are required by Cactus and should be correctly set in Cactus' .par file, it is recommended to get familiar with this file. Among others there are:
 
@@ -67,14 +67,11 @@ b) The parameters related to the choice of the equation of state, "EOS_Omni::pol
 One also needs to specify things like:
 
 ActiveThorns = "BNSdata"
-HydroBase::initial_hydro         = "BNSdata"
-ADMBase::initial_data            = "BNSdata"
-ADMBase::initial_lapse           = "BNSdata"
+HydroBase::initial_hydro         = "DNSdata"
+ADMBase::initial_data            = "DNSdata"
+ADMBase::initial_lapse           = "DNSdata"
 ADMBase::initial_shift           = "zero"
-ADMBase::initial_dtlapse         = "BNSdata"
+ADMBase::initial_dtlapse         = "DNSdata"
 ADMBase::initial_dtshift         = "zero"
 
 Communication between Sgrid and Cactus is achieved via files written into out_dir.
-
-
-
