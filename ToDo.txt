@@ -1,0 +1,34 @@
+Stuff to fix in DNSdata:
+------------------------
+
+*why is useful_files not in DNSdata?
+*there are a lot of typos in doc (even MyConfog)
+*there are grammar errors in doc
+*there are strange file names 
+*README is not very readable on Github because it runs beyond 80 cols!
+
+*README says:
+ActiveThorns = "BNSdata"
+HydroBase::initial_hydro         = "BNSdata"
+ADMBase::initial_data            = "BNSdata"
+ADMBase::initial_lapse           = "BNSdata"
+ADMBase::initial_shift           = "zero"
+ADMBase::initial_dtlapse         = "BNSdata"
+ADMBase::initial_dtshift         = "zero"
+ Really BNSdata??? 
+*What is actually in the parfiles Michal is running?
+
+*test contains the sgrid parfile named just test (bad name), also what if the
+ cactus test tries to run it?
+
+*I think it may be much more reasonable to have a dir e.g. m01.5_test inside
+ the current test dir that contains
+BNSdata_properties.txt  checkpoint.0   m01.5_test.par
+ here m01.5_test.par is the sgrid par file that you called test.par ...
+ Then et.par can be renamed to something reasonable as well, e.g. test.par or
+ something that cactus wants.
+
+*cactus parfile (et.par) talks about Meudon data!
+*sgrid parfile says "This should be very close to BAM:0113 from there CoRe
+ DB.". I wonder if that is true. 
+ Is BAM:0113 equal mass (m0=1.504) and 0 spin?
