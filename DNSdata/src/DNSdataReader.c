@@ -133,7 +133,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
      in gridfile */
   fp1 = fopen(gridfile, "wb");
   if(fp1==NULL) SGRID_errorexits("could not open %s", gridfile);
-  fprintf(fp1, "%s", "# this pointsfile contains the (x+sgrid_x_CM, y, z) of the bam grid points\n");
+  fprintf(fp1, "%s", "# this pointsfile contains the (x+sgrid_x_CM, y, z) of the cactus grid points\n");
   fprintf(fp1, "%s", "$BEGIN_data:\n");
   for(i=0; i<npoints; i++)
   {
@@ -397,7 +397,7 @@ void DNSdataReader(CCTK_ARGUMENTS)
         xb = x[i] * s180; /* in case there is 180 deg. rot. */
         xmax = (xb>0)?xmax1:xmax2;
         /* construct KV xi from Omega, ecc, rdot, xmax1-xmax2 */
-        xix = -Omega*y[i] + x[i]*rdotor; /* CM is at (0,0,0) in bam */
+        xix = -Omega*y[i] + x[i]*rdotor; /* CM is at (0,0,0) in cactus */
         xiy =  Omega*(x[i] - ecc*xmax) + y[i]*rdotor;
         xiz = z[i]*rdotor;
         /* vI^i = VR^i + xi^i */
