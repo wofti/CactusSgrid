@@ -221,8 +221,8 @@ ADMBase::initial_shift           = "zero"
 ADMBase::initial_dtlapse         = "DNSdata"
 ADMBase::initial_dtshift         = "zero"
 
-#DNSdata::sgrid_datadir           = "../../../arrangements/CactusSgrid/DNSdata/test"
-DNSdata::sgrid_datadir            = "/mnt/beegfs/home/mpirog/ET/2023_10_16/A/Cactus/arrangements/CactusSgrid/DNSdata/test/sgrid_id"
+DNSdata::sgrid_datadir           = "../../../arrangements/CactusSgrid/DNSdata/test/sgrid_id"
+#DNSdata::sgrid_datadir            = "/mnt/beegfs/home/mpirog/ET/2023_10_16/A/Cactus/arrangements/CactusSgrid/DNSdata/test/sgrid_id"
 
 DNSdata::keep_sgrid_output        = "no"
 DNSdata::use_interpolator         = "yes"
