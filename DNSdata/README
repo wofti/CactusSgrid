@@ -42,7 +42,7 @@ a) "checkpoint.0"
 b) "xxx.par"
    -is SGRID's own parameter file
 c) "BNSdata_properties.txt"
-   -contains essential system characteristics that summarizes the model
+   -contains essential system characteristics that summarize the model
 
 After the first initial stage of the run, when the SGRID interpolation is
 completed, the rest belongs solely to Cactus and is independent on the
@@ -64,7 +64,7 @@ is at the point halfway between the two stars, whereas Cactus prefers
 coordinates where the origin is at the center of mass of the binary. The
 DNSdata thorn will translate the stars accordingly, but the user must
 understand where the stars then lie and should adjust the Cactus grid
-centers accordingly, i.e. "xmax1" in "BNSdata_properties.txt" needs to be
+centers accordingly. I.e. "xmax1" in "BNSdata_properties.txt" needs to be
 shifted by the CM location "x_CM" to obtain the x-coordinate in Cactus.
 
 b) Ensure that the parameters related to the choice of the equation of state
