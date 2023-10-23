@@ -7,38 +7,62 @@ License      : GPL
 
 1. Purpose.
 
-This thorn allows one to use Sgrid-generated initial data (ID) of the Binary Neutron Star (BNS) as a starting point for the Cactus simulation.
+This thorn allows one to use Sgrid-generated initial data (ID) of the Binary
+Neutron Star (BNS) as a starting point for the Cactus simulation.
 
 2. How does it work?
 
-In order to make any ID usable for Cactus, it is necessary to prepare (usually by the interpolation) the data according to the Cactus numerical grid. Sgrid is a separate numerical code which creates numerical data for BSN. It could be also compiled in a specific way to be used as ID preparer (this version does not allow to generate initial data, but read them and pass to Cactus). In practice, it requires "two steps" of communication: Cactus <---> DNSdata <---> Sgrid. This thorn is this "intermediate step". Sgrid is included here as an external library, and there is a separate thorn dedicated to handling it
+In order to make any ID usable for Cactus, it is necessary to prepare
+(usually by the interpolation) the data according to the Cactus numerical
+grid. Sgrid is a separate numerical code which creates numerical data for
+BSN. It could be also compiled in a specific way to be used as ID preparer
+(this version does not allow to generate initial data, but read them and
+pass to Cactus). In practice, it requires "two steps" of communication:
+Cactus <---> DNSdata <---> Sgrid. This thorn is this "intermediate step".
+Sgrid is included here as an external library, and there is a separate thorn
+dedicated to handling it
 
 
 3. How to do it in practice?
 
-In order to read Sgrid-generated initial data and make them ready for interpolation, the correct path to the ID directory must be provided. It requires the following variable in the parfile:
+In order to read Sgrid-generated initial data and make them ready for
+interpolation, the correct path to the ID directory must be provided. It
+requires the following variable in the parfile:
 
 DNSdata::sgrid_datadir = "<path_to_ID_directory>"
 
 The standard Sgrid ID packet is composed of three files:
-a)"checkpoint.0"			- contains most of the information,
-b)"xxx.par"				- it is Sgrid .par file.
+a)"checkpoint.0"		- contains most of the information,
+b)"xxx.par"			- it is Sgrid .par file.
 c)"BNSdata_properties.txt"	- contains an essential system characteristics and serves as some kind of summary of the model.
 
-After the first initial stage of the run, when the Sgrid interpolation is completed, the rest belongs solely to Cactus and is independent on the choice of ID delivery, in particular it is independent on this thorn.
+After the first initial stage of the run, when the Sgrid interpolation is
+completed, the rest belongs solely to Cactus and is independent on the
+choice of ID delivery, in particular it is independent on this thorn.
 
 
 4. Other useful information
 
-Since some system characteristic are required by Cactus and should be correctly set in Cactus' .par file, it is recommended to get familiar with "BNSdata_properties.txt" file. Among others there are:
+Since some system characteristic are required by Cactus and should be
+correctly set in Cactus' .par file, it is recommended to get familiar with
+"BNSdata_properties.txt" file. Among others there are:
 
-a) Ensure that the center of the grid box in Cactus, specified by "CarpetRegrid2::position_x_1," corresponds to the density maximum of the neutron star (NS), denoted as "xmax1" in the Sgrid-generated "BNSdata_properties.txt" file. IMPORTANT COMMENT: Sgrid locates the origin of the coordinate system in a half-distance between the binary, whereas Cactus locates the origin of the coordinate system at the center of mass of the binary. In case of not equal mass binary, the user must take care about it.
+a) Ensure that the center of the grid box in Cactus, specified by
+"CarpetRegrid2::position_x_1," corresponds to the density maximum of the
+neutron star (NS), denoted as "xmax1" in the Sgrid-generated
+"BNSdata_properties.txt" file. IMPORTANT COMMENT: Sgrid locates the origin
+of the coordinate system in a half-distance between the binary, whereas
+Cactus locates the origin of the coordinate system at the center of mass of
+the binary. In case of not equal mass binary, the user must take care about
+it.
 
-b) Ensure that the parameters related to the choice of the equation of state align with Sgrid's eos parameters, specifically listed as "n_list," "rho0_list," and "kappa" in "BNSdata_properties.txt".
+b) Ensure that the parameters related to the choice of the equation of state
+align with Sgrid's eos parameters, specifically listed as "n_list,"
+"rho0_list," and "kappa" in "BNSdata_properties.txt".
 
 c) Additionally, it's necessary to specify the following:
 
-ActiveThorns = "BNSdata"
+ActiveThorns = "DNSdata"
 HydroBase::initial_hydro         = "DNSdata"
 ADMBase::initial_data            = "DNSdata"
 ADMBase::initial_lapse           = "DNSdata"
