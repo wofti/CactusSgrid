@@ -1,7 +1,7 @@
 Cactus Code Thorn DNSdata
-Author(s)    : Wolfgang Tichy, Michal Pirog
+Author(s)    : Wolfgang Tichy, Michal Pirog
 Maintainer(s): Wolfgang Tichy, Michal Pirog
-License      : GPL
+License      : GPL
 
 --------------------------------------------------------------------------
 
@@ -11,67 +11,37 @@ This thorn allows one to use Sgrid-generated initial data (ID) of the Binary Neu
 
 2. How does it work?
 
-In order to make Sgrid-generated ID usable for Cactus, Sgrid must become a part of the Cactus compilation and interpolate its initial data according to Cactus numerical grid. In practice, it requires "two steps" of communication: Cactus <---> DNSdata <---> Sgrid. This thorn is this "intermediate step". After the first stage of the run, when the Sgrid interpolation is completed, the second stage belongs solely to Cactus and is independent on the choice of ID delivery.
+In order to make any ID usable for Cactus, it is necessary to prepare (usually by the interpolation) the data according to the Cactus numerical grid. Sgrid is a separate numerical code which creates numerical data for BSN. It could be also compiled in a specific way to be used as ID preparer (this version does not allow to generate initial data, but read them and pass to Cactus). In practice, it requires "two steps" of communication: Cactus <---> DNSdata <---> Sgrid. This thorn is this "intermediate step". Sgrid is included here as an external library, and there is a separate thorn dedicated to handling it
+
 
 3. How to do it in practice?
 
-In the directory "useful_files" we provide a complete packet of files and the script "prepare_DNSdata.sh" which can prepare (almost) entire setup (almost) automatically. You can stop reading here and try to do it on your own, or you can go to "useful_files" directory, and simply execute the script. Reading "useful_files/read README.md" may help to understand it better.
+In order to read Sgrid-generated initial data and make them ready for interpolation, the correct path to the ID directory must be provided. It requires the following variable in the parfile:
+
+DNSdata::sgrid_datadir = "<path_to_ID_directory>"
+
+The standard Sgrid ID packet is composed of three files:
+a)"checkpoint.0"			- contains most of the information,
+b)"xxx.par"				- it is Sgrid .par file.
+c)"BNSdata_properties.txt"	- contains an essential system characteristics and serves as some kind of summary of the model.
+
+After the first initial stage of the run, when the Sgrid interpolation is completed, the rest belongs solely to Cactus and is independent on the choice of ID delivery, in particular it is independent on this thorn.
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!                                                                                      !!!
-!!                                                                                        !!
-!             YOU MAY STOP READING HERE AND SWITCH TO "useful_files/README.md"             !
-!!                                                                                        !!
-!!!                                                                                      !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+4. Other useful information
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!   For thous who want to do it by themselves, we provide some further explanations.   !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Since some system characteristic are required by Cactus and should be correctly set in Cactus' .par file, it is recommended to get familiar with "BNSdata_properties.txt" file. Among others there are:
 
+a) Ensure that the center of the grid box in Cactus, specified by "CarpetRegrid2::position_x_1," corresponds to the density maximum of the neutron star (NS), denoted as "xmax1" in the Sgrid-generated "BNSdata_properties.txt" file. IMPORTANT COMMENT: Sgrid locates the origin of the coordinate system in a half-distance between the binary, whereas Cactus locates the origin of the coordinate system at the center of mass of the binary. In case of not equal mass binary, the user must take care about it.
 
-3a. DNSdata thorn requires Sgrid to be compiled as a library and calls this library forcing Sgrid to start an interpolation. The procedure is described in the above-mentioned "useful_files/REDME.md" in points 2&3 and says:
+b) Ensure that the parameters related to the choice of the equation of state align with Sgrid's eos parameters, specifically listed as "n_list," "rho0_list," and "kappa" in "BNSdata_properties.txt".
 
-*********** an extract from useful_files/REDME.md ***********
-*
-*   2. Set the right path to the Sgrid library in your dns.cfg file. It probably supposed to be
-*   "LIBDIRS = path_to_this_project/sgrid/lib", and then the library itself:
-*   "LIBS = sgrid"
-*
-*   3. Go to Cactus directory and compile it using ll_comp.sh or by typing:
-*   "./simfactory/bin/sim setup-silent"
-*   "./simfactory/bin/sim build -j12 --thornlist ../dns.th --optionlist ../dns.cfg"
-*
-**************************************************************
-
-3b. In order to read Sgrid-generated initial data and make them ready for interpolation, the correct path to the ID directory must be provided. The procedure is described in the above-mentioned "useful_files/REDME.md" in point 4 and says:
-
-*********** an extract from useful_files/REDME.md ***********
-*
-*   4. Set the right path to the Sgrid-generated initial data directory in dns.par file:
-*   "DNSdata::sgrid_datadir = "path_to_ID_directory" ",
-*   and then build the skeleton of the run by typing:
-*   "./simfactory/bin/sim create-run name_of_the_run --parfile ../dns.par"
-*
-**************************************************************
-
-4. It is worth to mention that the standard Sgrid ID packet is composed of at least three files:
-a)"checkpoint.0"		- contains most of the information,
-b)"xxx.par"			- it is Sgrid .par file. IMPORTANT COMMENT: It may require some changes with respect to the version which was used to run Sgrid in the first place (to generate an initial data).
-c)"BNSdata_properties.txt"	- contains an essential system characteristics and serves as some kind of summary of the model. Since some system characteristic are required by Cactus and should be correctly set in Cactus' .par file, it is recommended to get familiar with this file. Among others there are:
-
-a) The center of the grid box in Cactus, "CarpetRegrid2::position_x_1" should correspond to the NS's density maximum, "xmax1" in Sgrid-genereted "BNSdata_properties.txt". IMPORTANT COMMENT: Sgrid locates the origin of the coordinate system in a half-distance between the binary, whereas Cactus locates the origin of the coordinate system at the center of mass of the binary. In case of not equal mass binary, the user must take care about it.
-b) The parameters related to the choice of the equation of state, "EOS_Omni::poly_K", xxx, yyy, should correspond to the Sgrid's eos parameters listed as: "n_list", "rho0_list", and "kappa" in Cactus-genereted "BNSdata_properties.txt".
-
-One also needs to specify things like:
+c) Additionally, it's necessary to specify the following:
 
 ActiveThorns = "BNSdata"
-HydroBase::initial_hydro         = "DNSdata"
-ADMBase::initial_data            = "DNSdata"
-ADMBase::initial_lapse           = "DNSdata"
-ADMBase::initial_shift           = "zero"
-ADMBase::initial_dtlapse         = "DNSdata"
-ADMBase::initial_dtshift         = "zero"
-
-Communication between Sgrid and Cactus is achieved via files written into out_dir.
+HydroBase::initial_hydro         = "DNSdata"
+ADMBase::initial_data            = "DNSdata"
+ADMBase::initial_lapse           = "DNSdata"
+ADMBase::initial_shift           = "zero"
+ADMBase::initial_dtlapse         = "DNSdata"
+ADMBase::initial_dtshift         = "zero"
