@@ -25,7 +25,8 @@ In practice, this process requires "two steps" of communication:
 
 Cactus <---> DNSdata <---> SGRID library. 
 
-This thorn is this "intermediate step".
+This thorn is this "intermediate step". Currently data transfer between Cactus
+and the SGRID library is achieved via files that are written into out_dir.
 
 
 3. How to do it in practice?
@@ -36,11 +37,14 @@ requires the following variable in the parfile:
 
 DNSdata::sgrid_datadir = "<path_to_ID_directory>"
 
-The standard SGRID ID packet is composed of three files:
+The standard SGRID ID packet is composed of a directory (e.g. named
+"<ID_directory>" containing three files:
+
 a) "checkpoint.0"
    -contains the SGIRD ID
-b) "xxx.par"
+b) "<ID_directory>.par"
    -is SGRID's own parameter file
+   -needs to have the same name as the containing dir plus the .par extension
 c) "BNSdata_properties.txt"
    -contains essential system characteristics that summarize the model
 
@@ -51,7 +55,7 @@ choice of ID delivery, in particular it is independent on this thorn.
 
 4. Other useful information
 
-Since some system characteristic are required by Cactus and should be
+Since some system characteristics are required by Cactus and should be
 correctly set in Cactus' .par file, it is recommended to get familiar with
 "BNSdata_properties.txt" file. Among others there are:
 
