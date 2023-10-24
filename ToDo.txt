@@ -32,3 +32,6 @@ BNSdata_properties.txt  checkpoint.0   m01.5_test.par
 *sgrid parfile says "This should be very close to BAM:0113 from there CoRe
  DB.". I wonder if that is true. 
  Is BAM:0113 equal mass (m0=1.504) and 0 spin?
+
+*cactus test parfile should turn on 1d- or 0d-output for
+ g_ij, K_ij, rho, press, eps, vel
