@@ -107,14 +107,14 @@ ActiveThorns = "CoordBase"
 CoordBase::domainsize = "minmax"
 
 CoordBase::xmin =    0.00
-CoordBase::ymin = -200.00
+CoordBase::ymin = -50.00
 CoordBase::zmin =    0.00
-CoordBase::xmax = +200.00
-CoordBase::ymax = +200.00
-CoordBase::zmax = +200.00
-CoordBase::dx   =    8.00
-CoordBase::dy   =    8.00
-CoordBase::dz   =    8.00
+CoordBase::xmax = +100.00
+CoordBase::ymax = +50.00
+CoordBase::zmax = +100.00
+CoordBase::dx   =    2.00
+CoordBase::dy   =    2.00
+CoordBase::dz   =    2.00
 
 CoordBase::boundary_size_x_lower     = 3
 CoordBase::boundary_size_y_lower     = 3
@@ -180,21 +180,13 @@ CarpetRegrid2::num_centres  = 3
 # covered by the finer grids and their buffers.
 # add 4 coarse grid points in between to have some leeway against roundoff
 # grid step sizes are for coarsest anticipated simulation dx = 1.5M
-CarpetRegrid2::num_levels_1 = 6
-CarpetRegrid2::position_x_1 = 15.1875
-CarpetRegrid2::radius_1[1]  =120.0
-CarpetRegrid2::radius_1[2]  = 60.0
-CarpetRegrid2::radius_1[3]  = 26.125
-CarpetRegrid2::radius_1[4]  = 17.875
-CarpetRegrid2::radius_1[5]  = 13     # star seems about 9.5 intially, then puffs up
+CarpetRegrid2::num_levels_1 = 2
+CarpetRegrid2::position_x_1 = 50.0
+CarpetRegrid2::radius_1[1]  = 10.0
 
-CarpetRegrid2::num_levels_2 = 6
-CarpetRegrid2::position_x_2 = -15.1875
-CarpetRegrid2::radius_2[1]  =120.0
-CarpetRegrid2::radius_2[2]  = 60.0
-CarpetRegrid2::radius_2[3]  = 26.125
-CarpetRegrid2::radius_2[4]  = 17.875
-CarpetRegrid2::radius_2[5]  = 13
+CarpetRegrid2::num_levels_2 = 2
+CarpetRegrid2::position_x_2 = -50.0
+CarpetRegrid2::radius_2[1]  = 10.0
 
 CarpetRegrid2::num_levels_3 = 1
 CarpetRegrid2::radius_3[1]  =120.0
@@ -222,7 +214,6 @@ ADMBase::initial_dtlapse         = "DNSdata"
 ADMBase::initial_dtshift         = "zero"
 
 DNSdata::sgrid_datadir           = "../../../arrangements/CactusSgrid/DNSdata/test/sgrid_id"
-#DNSdata::sgrid_datadir            = "/mnt/beegfs/home/mpirog/ET/2023_10_16/A/Cactus/arrangements/CactusSgrid/DNSdata/test/sgrid_id"
 
 DNSdata::keep_sgrid_output        = "no"
 DNSdata::use_interpolator         = "yes"
@@ -443,8 +434,8 @@ CarpetIOHDF5::out2D_vars      = "
   CarpetReduce::weight
   Grid::coordinates
   HydroBase::rho
-  HydroBase::vel
-  HydroBase::eps
+#  HydroBase::vel
+#  HydroBase::eps
   ADMBase::lapse
   ADMBase::shift
   ADMBase::metric
