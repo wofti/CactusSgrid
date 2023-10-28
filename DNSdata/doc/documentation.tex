@@ -76,10 +76,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % The author of the documentation
-\author{Thomas Radke} 
+\author{Wolfgang Tichy, Michal Pirog}
 
 % The title of the document (not necessarily the name of the Thorn)
-\title{Thorn Guide for the {\bf LocalInterp} Thorn}
+\title{Thorn Guide for the {\bf DNSData} Thorn}
 
 % the date your document was last changed, if your document is in CVS, 
 % please us:
@@ -96,10 +96,8 @@
 
 % Add an abstract for this thorn's documentation
 \begin{abstract}
-This thorn does processor-local interpolation of N-dimensional data
-arrays.  In general there may be many input arrays (all defined on the
-same uniform Cartesian grid) all being interpolated to the same set
-of interpolation points.
+This thorn allows one to use SGRID-generated initial data of Binary
+Neutron Stars as a starting point for the Cactus simulation.
 \end{abstract}
 
 % The following sections are suggestive only.
@@ -109,71 +107,28 @@ of interpolation points.
 
 \section{Introduction}
 
-This thorn provides processor-local interpolation, using the interpolation
-operator
-\begin{verbatim}
-  "uniform cartesian"
-\end{verbatim}
-for the Cactus local interpolation API \verb|CCTK_InterpLocalUniform()|.
-(Note that the word ``{\tt cartesian}'' is in lower case here!)
-It supports 1, 2, and 3-dimensional interpolation.
+To initiate the simulations of Binary Neutron Stars, one needs realistic initial data that accurately encodes the state of both stars in orbit prior to merger. The numerical code, SGRID, allows the generation of initial data for stars characterized by arbitrary masses, spins, and orbital eccentricities, along with an equation of state.
 
-See the Cactus Reference Manual
-for a full description of the \verb|CCTK_InterpLocalUniform()| API,
-and some examples of how to use it.
+SGRID is a separate numerical code that can create initial data. To do this, it has to be compiled and run separately from Cactus. On the other hand, this initial data can be used by Cactus to conduct a time-dependent simulation. However, SGRID writes ID files in its own format. To make it usable for Cactus, it is necessary to provide this data on the grid points used by Cactus. This is achieved by interpolating data from SGRID's grid points onto the grid points used by Cactus. The functions that perform the actual interpolation reside inside the SGRID library, which is usually compiled into Cactus by adding the thorn ExternalLibraries-SGRID.
+
+To simplify this process, we have developed a Cactus thorn called DNSdata, which can read SGRID initial data into Cactus, allowing Cactus to perform the subsequent evolution.
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{History}
 
-This interpolator was written by Thomas Radke in early 2001 (drawing
-on older code by Paul Walker).  It originally lived in the PUGHInterp
-thorn, but it turned to have very little to do with PUGH, so was moved
-here in winter 2001-2002.
-
-From winter 2001-2002 to July 2003 this thorn also contained another
-interpolator written by Jonathan Thornburg, but in July 2003 that
-interpolator was moved to {\bf AEIThorns/AEILocalInterp/} because it was
-(is) GPL and Cactus policies are that this arrangement ({\bf CactusBase})
-is reserved for code under the Cactus-flesh license (= GPL except
-that it's like LGPL for linking with other thorns).
-
-Because CVS can't delete directories, this thorn still contains a lot
-of empty-except-for-CVS-directories directory trees left over from
-Jonathan Thornburg's interpolator.  You can/should ignore these.
+To be written.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Implementation}
 
-Internally, this interpolator always does 3-D interpolation, inserting
-zero coordinates as appropriate for lower dimensionalities.  The
-interpolation is done by successive 1-D interpolations along each
-axis.%%%
-\footnote{%%%
-     Note that this means that different axes are treated
-     slightly differently by the interpolator.  In other
-     words, at the level of finite differencing errors,
-     interpolation does {\em not\/} commute with permuting
-     the axes.  However, in practice the differences are
-     likely to be small, at least for smooth input data.
-     }%%%
-{}  See the \verb|README| file in the \verb|src/| directory
-for further details.
+Sgrid is a separate numerical code which creates initial data. One may find the details: https://www.physics.fau.edu/~wolf/Research/FAU-sgrid/
 
-\subsection{Additional information passed in as table options}
-
-The \verb|CCTK_InterpLocalUniform()| API accepts a table handle as one of its
-arguments which can be used to pass additional information to the local
-interpolator via table options.
-
-The only table option supported so far by {\bf LocalInterp}'s {\tt "uniform
-cartesian"} operator is the interpolation order which must be
-passed as a CCTK\_INT value with key {\tt "order"}. Options with keys
-{\tt "N\_boundary\_points\_to\_omit", "boundary\_off\_centering\_tolerance"}, or
-{\tt "boundary\_extrapolation\_tolerance"} (which are usually passed by a
-global interpolator) are also recognized but silently ignored (a level-4 warning
-message will be issued in this case).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
