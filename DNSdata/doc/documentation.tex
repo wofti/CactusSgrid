@@ -2,46 +2,51 @@
 %  Cactus Thorn template for ThornGuide documentation
 %  Author: Ian Kelley
 %  Date: Sun Jun 02, 2002
-%  $Header$                                                             
+%  $Header$
 %
-%  Thorn documentation in the latex file doc/documentation.tex 
+%  Thorn documentation in the latex file doc/documentation.tex
 %  will be included in ThornGuides built with the Cactus make system.
-%  The scripts employed by the make system automatically include 
-%  pages about variables, parameters and scheduling parsed from the 
-%  relevent thorn CCL files.
-%  
-%  This template contains guidelines which help to assure that your     
-%  documentation will be correctly added to ThornGuides. More 
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
 %  information is available in the Cactus UsersGuide.
-%                                                    
+%
 %  Guidelines:
 %   - Do not change anything before the line
-%       % BEGIN CACTUS THORNGUIDE",
-%     except for filling in the title, author, date etc. fields.
-%   - You can define your own macros are OK, but they must appear after
-%     the BEGIN CACTUS THORNGUIDE line, and do not redefine standard 
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
 %     latex commands.
-%   - To avoid name clashes with other thorns, 'labels', 'citations', 
-%     'references', and 'image' names should conform to the following 
-%     convention:          
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
 %       ARRANGEMENT_THORN_LABEL
-%     For example, an image wave.eps in the arrangement CactusWave and 
+%     For example, an image wave.eps in the arrangement CactusWave and
 %     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
-%   - Graphics should only be included using the graphix package. 
-%     More specifically, with the "includegraphics" command. Do
-%     not specify any graphic file extensions in your .tex file. This 
-%     will allow us (later) to create a PDF version of the ThornGuide
-%     via pdflatex. |
-%   - References should be included with the latex "bibitem" command.  
-%   - For the benefit of our Perl scripts, and for future extensions, 
-%     please use simple latex.     
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
 %
-% *======================================================================* 
-% 
+% *======================================================================*
+%
 % Example of including a graphic image:
 %    \begin{figure}[ht]
 % 	\begin{center}
-%    	   \includegraphics[width=6cm]{/home/runner/work/tests/tests/arrangements/CactusNumerical/LocalInterp/doc/MyArrangement_MyThorn_MyFigure}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
 % 	\end{center}
 % 	\caption{Illustration of this and that}
 % 	\label{MyArrangement_MyThorn_MyLabel}
@@ -55,10 +60,10 @@
 %
 % Example of including a reference
 %   \bibitem{MyArrangement_MyThorn_Author99}
-%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
 %   1--16. {\tt http://www.nowhere.com/}}
 %
-% *======================================================================* 
+% *======================================================================*
 
 % If you are using CVS use this line to give version information
 % $Header$
@@ -66,32 +71,32 @@
 \documentclass{article}
 
 % Use the Cactus ThornGuide style file
-% (Automatically used from Cactus distribution, if you have a 
+% (Automatically used from Cactus distribution, if you have a
 %  thorn without the Cactus Flesh download this from the Cactus
 %  homepage at www.cactuscode.org)
 \usepackage{../../../../doc/latex/cactus}
 
-\newlength{\tableWidth} \newlength{\maxVarWidth} \newlength{\paraWidth} \newlength{\descWidth} \begin{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
 
 % The author of the documentation
-\author{Wolfgang Tichy, Michal Pirog}
+\author{Wolfgang Tichy \textless wolf@fau.edu\textgreater \\ Michal Pirog \textless mpirog@fau.edu\textgreater}
 
 % The title of the document (not necessarily the name of the Thorn)
-\title{Thorn Guide for the {\bf DNSData} Thorn}
+\title{DNSdata}
 
-% the date your document was last changed, if your document is in CVS, 
-% please us:
+% the date your document was last changed, if your document is in CVS,
+% please use:
 %    \date{$ $Date$ $}
-\date{$ $Date$ $}
+% when using git instead record the commit ID:
+%    \date{\gitrevision{<path-to-your-.git-directory>}}
+\date{October 28 2023}
 
 \maketitle
 
 % Do not delete next line
 % START CACTUS THORNGUIDE
 
-% Add all definitions used in this documentation here 
+% Add all definitions used in this documentation here
 %   \def\mydef etc
 
 % Add an abstract for this thorn's documentation
@@ -103,8 +108,6 @@ Neutron Stars as a starting point for the Cactus simulation.
 % The following sections are suggestive only.
 % Remove them or add your own.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section{Introduction}
 
 To initiate the simulations of Binary Neutron Stars, one needs realistic initial data that accurately encodes the state of both stars in orbit prior to merger. The numerical code, SGRID, allows the generation of initial data for stars characterized by arbitrary masses, spins, and orbital eccentricities, along with an equation of state.
@@ -113,79 +116,40 @@ SGRID is a separate numerical code that can create initial data. To do this, it 
 
 To simplify this process, we have developed a Cactus thorn called DNSdata, which can read SGRID initial data into Cactus, allowing Cactus to perform the subsequent evolution.
 
+\section{Physical System}
+
+\section{Numerical Implementation}
+
+Sgrid is a separate numerical code which creates initial data. One may find the details: \\ https://www.physics.fau.edu/~wolf/Research/FAU-sgrid/
+
+\section{Using This Thorn}
+
+\subsection{Obtaining This Thorn}
+
+\subsection{Basic Usage}
+
+\subsection{Special Behaviour}
+
+\subsection{Interaction With Other Thorns}
+
+\subsection{Examples}
+
+\subsection{Support and Feedback}
+
+\section{History}
+
+\subsection{Thorn Source Code}
+
+\subsection{Thorn Documentation}
+
+\subsection{Acknowledgements}
 
 
+\begin{thebibliography}{9}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{History}
-
-To be written.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Implementation}
-
-Sgrid is a separate numerical code which creates initial data. One may find the details: https://www.physics.fau.edu/~wolf/Research/FAU-sgrid/
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{thebibliography}
 
 % Do not delete next line
 % END CACTUS THORNGUIDE
 
-
-
-\section{Parameters} 
-
-
-\parskip = 0pt
-\parskip = 10pt 
-
-\section{Interfaces} 
-
-
-\parskip = 0pt
-
-\vspace{3mm} \subsection*{General}
-
-\noindent {\bf Implements}: 
-
-localinterp
-\vspace{2mm}
-
-\vspace{5mm}\parskip = 10pt 
-
-\section{Schedule} 
-
-
-\parskip = 0pt
-
-
-\noindent This section lists all the variables which are assigned storage by thorn CactusNumerical/LocalInterp.  Storage can either last for the duration of the run ({\bf Always} means that if this thorn is activated storage will be assigned, {\bf Conditional} means that if this thorn is activated storage will be assigned for the duration of the run if some condition is met), or can be turned on for the duration of a schedule function.
-
-
-\subsection*{Storage}NONE
-\subsection*{Scheduled Functions}
-\vspace{5mm}
-
-\noindent {\bf CCTK\_STARTUP} 
-
-\hspace{5mm} localinterp\_startup 
-
-\hspace{5mm}{\it register localinterp's interpolation operators } 
-
-
-\hspace{5mm}
-
- \begin{tabular*}{160mm}{cll} 
-~ & After:  & driver\_startup \\ 
-~ & Language:  & c \\ 
-~ & Type:  & function \\ 
-\end{tabular*} 
-
-
-
-\vspace{5mm}\parskip = 10pt 
 \end{document}
