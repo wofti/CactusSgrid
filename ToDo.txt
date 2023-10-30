@@ -28,10 +28,27 @@ BNSdata_properties.txt  checkpoint.0   m01.5_test.par
  Then et.par can be renamed to something reasonable as well, e.g. test.par or
  something that cactus wants.
 
-*cactus parfile (et.par) talks about Meudon data!
+*cactus parfile (CactusSgrid_test.par) talks about Meudon data!
 *sgrid parfile says "This should be very close to BAM:0113 from there CoRe
  DB.". I wonder if that is true. 
  Is BAM:0113 equal mass (m0=1.504) and 0 spin?
 
+*Why is the test par file called CactusSgrid_test.par ? It tests the
+ DNSdata thorn, not sgrid or CactusSgrid. A better name would be
+ DNSdata_test.par .
+
 *cactus test parfile should turn on 1d- or 0d-output for
  g_ij, K_ij, rho, press, eps, vel
+
+*in "Numerical Implementation" documentation.tex talks about the sgrid code
+ Why? I thought the documentation is supposed to discuss our thorn?
+ It's not bad to mention sgrid, but I wonder if this is the right place...
+
+*Why do we need git@github.com:dziunek11/DNSpreparer.git ?
+ Would it not be better if all we need is in the thorn dir, e.g. in
+ useful_files???
+
+*Also useful_files seems to have files with the same names as in 
+ git@github.com:dziunek11/DNSpreparer.git
+
+*Can we not have mess???
