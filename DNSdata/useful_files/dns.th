@@ -687,12 +687,12 @@ WVUThorns_Diagnostics/smallbPoynET
 WVUThorns_Diagnostics/VolumeIntegrals_GRMHD
 WVUThorns_Diagnostics/VolumeIntegrals_vacuum
 
-!TARGET   = $ARR
-!TYPE     = git
-!URL      = https://bitbucket.org/knarrff/nstracker.git
-!REPO_PATH = ../../arrangements/$1/../../repos/nstracker
-!CHECKOUT =
-LSUThorns/NSTracker
+#!TARGET   = $ARR
+#!TYPE     = git
+#!URL      = https://bitbucket.org/knarrff/nstracker.git
+#!REPO_PATH = ../../arrangements/$1/../../repos/nstracker
+#!CHECKOUT =
+#LSUThorns/NSTracker
 
 !TARGET   = $ARR
 !TYPE     = git

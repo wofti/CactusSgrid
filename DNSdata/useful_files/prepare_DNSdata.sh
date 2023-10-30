@@ -15,27 +15,27 @@ cd $XXX
 #echo 'Sgrid downladed'
 #echo ''
 
-cp ../dns.* ./
+cp ../dns* ./
 curl -kLO https://raw.githubusercontent.com/gridaphobe/CRL/ET_2022_05/GetComponents
 chmod a+x GetComponents
 ./GetComponents dns.th
-cp ../comp.sh Cactus/
+cp ../s_comp.sh Cactus/
 
 echo ''
 echo 'Cactus downloaded'
 echo ''
 
-git clone https://github.com/zachetienne/nrpytutorial.git
-cd nrpytutorial/IllinoisGRMHD/doc
-./generate_IllinoisGRMHD_from_ipynb_files.sh
-cd ../../../Cactus/arrangements/WVUThorns
-rm IllinoisGRMHD
-rm Convert_to_HydroBase
-rm ID_converter_ILGRMHD
-ln -s ../../../nrpytutorial/IllinoisGRMHD/ IllinoisGRMHD
-ln -s ../../../nrpytutorial/IllinoisGRMHD/Convert_to_HydroBase Convert_to_HydroBase
-ln -s ../../../nrpytutorial/IllinoisGRMHD/ID_converter_ILGRMHD ID_converter_ILGRMHD
-cd ../../../../
+#git clone https://github.com/zachetienne/nrpytutorial.git
+#cd nrpytutorial/IllinoisGRMHD/doc
+#./generate_IllinoisGRMHD_from_ipynb_files.sh
+#cd ../../../Cactus/arrangements/WVUThorns
+#rm IllinoisGRMHD
+#rm Convert_to_HydroBase
+#rm ID_converter_ILGRMHD
+#ln -s ../../../nrpytutorial/IllinoisGRMHD/ IllinoisGRMHD
+#ln -s ../../../nrpytutorial/IllinoisGRMHD/Convert_to_HydroBase Convert_to_HydroBase
+#ln -s ../../../nrpytutorial/IllinoisGRMHD/ID_converter_ILGRMHD ID_converter_ILGRMHD
+#cd ../../../../
 
 #echo ''
 #echo 'nrp downloaded and linked'
