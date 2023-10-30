@@ -116,7 +116,7 @@ SGRID is a separate numerical code that can create initial data. To do this, it 
 
 To simplify this process, we have developed a Cactus thorn called DNSdata, which can read SGRID initial data into Cactus, allowing Cactus to perform the subsequent evolution.
 
-\section{Physical System}
+%\section{Physical System}
 
 \section{Numerical Implementation}
 
@@ -126,17 +126,91 @@ Sgrid is a separate numerical code which creates initial data. One may find the 
 
 \subsection{Obtaining This Thorn}
 
+To set up Cactus together with this thorn, one may use already prepared script and some useful files by typing:
+
+git clone git@github.com:dziunek11/DNSpreparer.git
+
+It creates the directory "DNS\_preparer" and downloads a couple of files. One of them is "prepare\_DNSdata.sh". Executing it will result by downloading Cactus and its components according to the thornlist "dns.th". The script contains a much more lines which are currently commented out. They allow the user for more flexibility during compilation, but it requires more independent work.
+
+Explanation of the "other files":
+
+\begin{itemize}
+\item dns.th - it is a thorns list required by Cactus (and by GetComponents script to download all necessary components to compile Cactus).
+\item dns.par - it is an example of Cactus input parameter file. There is a place in it to set the parameters related to DNSdata thorn. In particular, you must set the path to SGRID-generated initial data in it.
+\item dns.cfg - it is a configuration file which contains a compilation options. (In particular, the SGRID library path is set in it. These lines are commented out because it is not necessary as you compile Cactus with SGRID as an External Library, see next line)
+\item MyConfig  - it is a file required by SGRID to be compiled with a proper options. You are setting here the compiler, libraries, etc. (Not necessary anymore, since SGRID exist as a Cactus External Library now and is already included in the thornlist "dns.th")
+\item scomp.sh - it is just a sbath submission script which you may use to compile Cactus. Of course, it is a template to be modified before using.
+\end{itemize}
+
 \subsection{Basic Usage}
 
-\subsection{Special Behaviour}
+In order to read SGRID-generated initial data and make them ready for
+interpolation, the correct path to the ID directory must be provided. It
+requires the following variable in the parfile:
+
+DNSdata::sgrid\_datadir = "path\_to\_ID\_directory"
+
+The standard SGRID ID packet is a directory containing three files:
+\begin{enumerate}
+\item "checkpoint.0" - contains the SGIRD ID
+\item "ID\_directory.par" - is SGRID's own parameter file - needs to have the same name as the containing dir plus the .par extension
+\item "BNSdata\_properties.txt" - contains essential system characteristics that summarize the model
+\end{enumerate}
+
+After the first initial stage of the run, when the SGRID interpolation is
+completed, the rest belongs solely to Cactus and is independent on the
+choice of ID delivery, in particular it is independent on this thorn.
+
+%\subsection{Special Behaviour}
 
 \subsection{Interaction With Other Thorns}
 
+ExternalLibraries-SGRID, ADMBase, and HydroBase.
+
+To import metric quantities from an initial data solution, the following HydroBase and ADMBase variables need to be set to DNSdata:
+\begin{itemize}
+\item HydroBase::initial\_hydro          = "DNSdata"
+\item ADMBase::initial\_data             = "DNSdata"
+\item ADMBase::initial\_lapse            = "DNSdata"
+\item ADMBase::initial\_shift            = "zero"
+\item ADMBase::initial\_dtlapse          = "DNSdata"
+\item ADMBase::initial\_dtshift          = "zero"
+\end{itemize}
+
+\subsection{Other useful information}
+
+Since some system characteristics are required by Cactus and should be
+correctly set in Cactus' .par file, it is recommended to get familiar with
+"BNSdata\_properties.txt" file. Among others there are:
+
+a) Ensure that the center of the grid box in Cactus, specified by
+"CarpetRegrid2::position\_x\_1," corresponds to the density maximum of the
+neutron star (NS), denoted as "xmax1" in the SGRID-generated
+"BNSdata\_properties.txt" file. IMPORTANT COMMENT about unequal mass
+binaries: SGRID uses coordinates where the origin of the coordinate system
+is at the point halfway between the two stars, whereas Cactus prefers
+coordinates where the origin is at the center of mass of the binary. The
+DNSdata thorn will translate the stars accordingly, but the user must
+understand where the stars then lie and should adjust the Cactus grid
+centers accordingly. I.e. "xmax1" in "BNSdata\_properties.txt" needs to be
+shifted by the CM location "x\_CM" to obtain the x-coordinate in Cactus.
+
+b) Ensure that the parameters related to the choice of the equation of state
+(EoS) align with SGRID's EoS parameters. SGRID's EoS is described in the
+file "BNSdata\_properties.txt". For a piecewise polytrope the relevant lines
+are indicated by "rho0\_list", "n\_list", and "kappa". Here "rho0\_list"
+specifies the rest mass densities at which we switch between polytropes.
+"n\_list" gives the polytropic index n for each piece. Note that
+   $\Gamma = 1 + 1/n$    and    $P = K \rho0^\Gamma$.
+"kappa" specifies the K of the polytrope used for the lowest density.
+
 \subsection{Examples}
 
-\subsection{Support and Feedback}
+We provide a sample of initial data located in the directory "sgrid\_id" within a standard "test" directory. A brief test, which does not produce any output for the importer's verification interface, is set up in the parfile "CactusSgrid\_test.par", also located in the standard "test" directory
 
-\section{History}
+%\subsection{Support and Feedback}
+
+%\section{History}
 
 \subsection{Thorn Source Code}
 
