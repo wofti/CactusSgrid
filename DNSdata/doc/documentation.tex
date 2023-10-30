@@ -120,7 +120,9 @@ To simplify this process, we have developed a Cactus thorn called DNSdata, which
 
 \section{Numerical Implementation}
 
-Sgrid is a separate numerical code which creates initial data. One may find the details: \\ https://www.physics.fau.edu/~wolf/Research/FAU-sgrid/
+Sgrid is a separate numerical code which creates initial data. One may find the details
+in: \\
+https://www.physics.fau.edu/\verb!~!wolf/Research/FAU-sgrid/
 
 \section{Using This Thorn}
 
@@ -139,7 +141,7 @@ Explanation of the "other files":
 \item dns.par - it is an example of Cactus input parameter file. There is a place in it to set the parameters related to DNSdata thorn. In particular, you must set the path to SGRID-generated initial data in it.
 \item dns.cfg - it is a configuration file which contains a compilation options. (In particular, the SGRID library path is set in it. These lines are commented out because it is not necessary as you compile Cactus with SGRID as an External Library, see next line)
 \item MyConfig  - it is a file required by SGRID to be compiled with a proper options. You are setting here the compiler, libraries, etc. (Not necessary anymore, since SGRID exist as a Cactus External Library now and is already included in the thornlist "dns.th")
-\item scomp.sh - it is just a sbath submission script which you may use to compile Cactus. Of course, it is a template to be modified before using.
+\item s\_comp.sh - it is just a sbatch submission script which you may use to compile Cactus. Of course, it is a template to be modified before using.
 \end{itemize}
 
 \subsection{Basic Usage}
