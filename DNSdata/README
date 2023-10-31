@@ -32,13 +32,33 @@ and the SGRID library is achieved via files that are written into out_dir.
 3. How to do it in practice?
 
 In order to read SGRID-generated initial data and make them ready for
-interpolation, the correct path to the ID directory must be provided. It
-requires the following variable in the parfile:
+interpolation, the correct path to the ID directory must be provided.
+This requires setting the following parameter in the Cactus parfile:
 
 DNSdata::sgrid_datadir = "<path_to_ID_directory>"
 
-The standard SGRID ID packet is composed of a directory (e.g. named
-"<ID_directory>" containing three files:
+Additionally, it is necessary to specify the following in the Cactus
+parfile:
+
+ActiveThorns = "DNSdata"
+HydroBase::initial_hydro         = "DNSdata"
+ADMBase::initial_data            = "DNSdata"
+ADMBase::initial_lapse           = "DNSdata"
+ADMBase::initial_shift           = "zero"
+ADMBase::initial_dtlapse         = "DNSdata"
+ADMBase::initial_dtshift         = "zero"
+
+After the first initial stage of the run, when the SGRID interpolation is
+completed, the rest belongs solely to Cactus and is independent on the
+choice of ID delivery, in particular it is independent on this thorn.
+
+
+4. Other useful information
+
+The standard SGRID ID packet that is specified e.g. by
+DNSdata::sgrid_datadir = "<path_to_ID_directory>"
+is composed of a directory (e.g. named "<ID_directory>") containing three
+files:
 
 a) "checkpoint.0"
    -contains the SGIRD ID
@@ -47,13 +67,6 @@ b) "<ID_directory>.par"
    -needs to have the same name as the containing dir plus the .par extension
 c) "BNSdata_properties.txt"
    -contains essential system characteristics that summarize the model
-
-After the first initial stage of the run, when the SGRID interpolation is
-completed, the rest belongs solely to Cactus and is independent on the
-choice of ID delivery, in particular it is independent on this thorn.
-
-
-4. Other useful information
 
 Since some system characteristics are required by Cactus and should be
 correctly set in Cactus' .par file, it is recommended to get familiar with
@@ -79,13 +92,3 @@ specifies the rest mass densities at which we switch between polytropes.
 "n_list" gives the polytropic index n for each piece. Note that
    Gamma = 1 + 1/n    and    P = K rho0^Gamma.
 "kappa" specifies the K of the polytrope used for the lowest density.
-
-c) Additionally, it is necessary to specify the following:
-
-ActiveThorns = "DNSdata"
-HydroBase::initial_hydro         = "DNSdata"
-ADMBase::initial_data            = "DNSdata"
-ADMBase::initial_lapse           = "DNSdata"
-ADMBase::initial_shift           = "zero"
-ADMBase::initial_dtlapse         = "DNSdata"
-ADMBase::initial_dtshift         = "zero"
