@@ -110,11 +110,25 @@ Neutron Stars as a starting point for the Cactus simulation.
 
 \section{Introduction}
 
-To initiate the simulations of Binary Neutron Stars, one needs realistic initial data that accurately encodes the state of both stars in orbit prior to merger. The numerical code, SGRID, allows the generation of initial data for stars characterized by arbitrary masses, spins, and orbital eccentricities, along with an equation of state.
+To initiate the simulations of Binary Neutron Stars, one needs realistic
+initial data that accurately encodes the state of both stars in orbit prior
+to merger. The numerical code, SGRID, allows the generation of initial data
+for stars characterized by arbitrary masses, spins, and orbital
+eccentricities, along with an equation of state.
 
-SGRID is a separate numerical code that can create initial data. To do this, it has to be compiled and run separately from Cactus. On the other hand, this initial data can be used by Cactus to conduct a time-dependent simulation. However, SGRID writes ID files in its own format. To make it usable for Cactus, it is necessary to provide this data on the grid points used by Cactus. This is achieved by interpolating data from SGRID's grid points onto the grid points used by Cactus. The functions that perform the actual interpolation reside inside the SGRID library, which is usually compiled into Cactus by adding the thorn ExternalLibraries-SGRID.
+SGRID is a separate numerical code that can create initial data. To do this,
+it has to be compiled and run separately from Cactus.
+This initial data can then be used by Cactus to conduct a time-dependent
+simulation. However, SGRID writes ID files in its own format. To make it
+usable for Cactus, it is necessary to provide this data on the grid points
+used by Cactus. This is achieved by interpolating data from SGRID's grid
+points onto the grid points used by Cactus. The functions that perform the
+actual interpolation reside inside the SGRID library, which is usually
+compiled into Cactus by adding the thorn ExternalLibraries-SGRID.
 
-To simplify this process, we have developed a Cactus thorn called DNSdata, which can read SGRID initial data into Cactus, allowing Cactus to perform the subsequent evolution.
+To simplify this process, we have developed a Cactus thorn called DNSdata,
+which can read SGRID initial data into Cactus, allowing Cactus to perform
+the subsequent evolution.
 
 %\section{Physical System}
 
@@ -128,13 +142,24 @@ https://www.physics.fau.edu/\verb!~!wolf/Research/FAU-sgrid/
 
 \subsection{Obtaining This Thorn}
 
-The thorn itself could be downloaded by typing:
+The arrangement containing the thorn can be downloaded by typing:
 
 git clone git@github.com:wofti/CactusSgrid.git
 
-In the directory "DNSdata/useful\_files" among other files, there is a script named "prepare\_DNSdata.sh". One can use it to set up Cactus together with this thorn. The only thing you need to do is execute the script, which will result in the downloading of Cactus and its components according to the thornlist "dns.th". The script contains many more lines that are currently commented out. These lines allow the user more flexibility during compilation, but it requires more independent work.
+The thorn is in the directory DNSdata.
 
-Explanation of the "other files":
+The directory "DNSdata/useful\_files" contains several files that might
+be useful to a new user, such as the parfile example "dns.par".
+
+Among other files, there is also a script named "prepare\_DNSdata.sh". One
+can use it to set up Cactus together with this thorn. The only thing you
+need to do is execute the script, which will result in the downloading of
+Cactus and its components according to the thornlist "dns.th". The script
+contains many more lines that are currently commented out. These lines allow
+the user more flexibility during compilation, but it requires more
+independent work.
+
+Explanation of the files in "DNSdata/useful\_files":
 
 \begin{itemize}
 \item dns.th - it is a thorns list required by Cactus (and by GetComponents script to download all necessary components to compile Cactus).
@@ -167,9 +192,11 @@ choice of ID delivery, in particular it is independent on this thorn.
 
 \subsection{Interaction With Other Thorns}
 
+The thorn DNSdata requires the following other thorns:
 ExternalLibraries-SGRID, ADMBase, and HydroBase.
 
-To import metric quantities from an initial data solution, the following HydroBase and ADMBase variables need to be set to DNSdata:
+To import metric quantities from an initial data solution, the following
+HydroBase and ADMBase variables need to be set to DNSdata:
 \begin{itemize}
 \item HydroBase::initial\_hydro          = "DNSdata"
 \item ADMBase::initial\_data             = "DNSdata"
