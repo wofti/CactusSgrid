@@ -57,7 +57,7 @@ choice of ID delivery, in particular it is independent on this thorn.
 
 Since some system characteristics are required by Cactus and should be
 correctly set in Cactus' .par file, it is recommended to get familiar with
-"BNSdata_properties.txt" file. Among others there are:
+the "BNSdata_properties.txt" file. Important points are:
 
 a) Ensure that the center of the grid box in Cactus, specified by
 "CarpetRegrid2::position_x_1," corresponds to the density maximum of the

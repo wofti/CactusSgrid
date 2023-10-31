@@ -183,7 +183,7 @@ To import metric quantities from an initial data solution, the following HydroBa
 
 Since some system characteristics are required by Cactus and should be
 correctly set in Cactus' .par file, it is recommended to get familiar with
-"BNSdata\_properties.txt" file. Among others there are:
+"BNSdata\_properties.txt" file. Important points are:
 
 a) Ensure that the center of the grid box in Cactus, specified by
 "CarpetRegrid2::position\_x\_1," corresponds to the density maximum of the
@@ -203,7 +203,7 @@ file "BNSdata\_properties.txt". For a piecewise polytrope the relevant lines
 are indicated by "rho0\_list", "n\_list", and "kappa". Here "rho0\_list"
 specifies the rest mass densities at which we switch between polytropes.
 "n\_list" gives the polytropic index n for each piece. Note that
-   $\Gamma = 1 + 1/n$    and    $P = K \rho0^\Gamma$.
+   $\Gamma = 1 + 1/n$    and    $P = K \rho_0^\Gamma$.
 "kappa" specifies the K of the polytrope used for the lowest density.
 
 \subsection{Examples}
