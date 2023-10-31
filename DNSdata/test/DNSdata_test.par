@@ -1,11 +1,7 @@
-# Carpet parameter file for binary Neutron star system
-# physical ID is LORENE dataset G2_I12vs12_D4R33T21_45km.resu
-#
-
 #------------------------------------------------------------------------------
 # Cactus parameters:
 #------------------------------------------------------------------------------
-Cactus::cctk_run_title     = "CactusSgrid_test"
+Cactus::cctk_run_title     = "DNSdata_test"
 Cactus::cctk_full_warnings = "yes"
 Cactus::highlight_warning_messages = "no"
 
@@ -219,7 +215,16 @@ DNSdata::keep_sgrid_output        = "no"
 DNSdata::use_interpolator         = "yes"
 #DNSdata::IDfiles_dir             = "???"
 
-EOS_Omni::poly_K = 123.613314525753
+EOS_Omni::n_pieces                   = 4
+EOS_Omni::hybrid_gamma_th            = 1.75
+EOS_Omni::hybrid_k0                  = 8.94989354e-02
+EOS_Omni::hybrid_rho[0]              = 2.36701096e-04
+EOS_Omni::hybrid_rho[1]              = 8.11322219e-04
+EOS_Omni::hybrid_rho[2]              = 1.61880065e-03
+EOS_Omni::hybrid_gamma[0]            = 1.0 + 1.0/2.80171728459242
+EOS_Omni::hybrid_gamma[1]            = 1.0 + 1.0/0.498753117206983
+EOS_Omni::hybrid_gamma[2]            = 1.0 + 1.0/0.503018108651911
+EOS_Omni::hybrid_gamma[3]            = 1.0 + 1.0/0.540248514316586
 
 #----------
 # Numerics:
@@ -362,7 +367,7 @@ Dissipation::vars                       = "
 # Output:
 #------------------------------------------------------------------------------
 
-IO::out_dir = CactusSgrid_test
+IO::out_dir = DNSdata_test
 
 IOBasic::outInfo_every = 0
 IOBasic::outInfo_reductions = "maximum"
@@ -482,12 +487,12 @@ QuasiLocalMeasures::surface_name[1] = "waveextract surface at 250"
 # Checkpoint/Recovery:
 #------------------------------------------------------------------------------
 IOHDF5::checkpoint                  = "no"
-IO::checkpoint_dir                  = CactusSgrid_test
+IO::checkpoint_dir                  = DNSdata_test
 IO::checkpoint_ID                   = "no"
 IO::checkpoint_on_terminate         = "no"
 
 IO::recover     = "autoprobe"
-IO::recover_dir = CactusSgrid_test
+IO::recover_dir = DNSdata_test
 
 
 #------------------------------------------------------------------------------
