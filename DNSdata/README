@@ -25,8 +25,9 @@ In practice, this process requires "two steps" of communication:
 
 Cactus <---> DNSdata <---> SGRID library. 
 
-This thorn is this "intermediate step". Currently data transfer between Cactus
-and the SGRID library is achieved via files that are written into out_dir.
+The DNSdata thorn is this "intermediate step". Currently data transfer
+between Cactus and the SGRID library is achieved via files that are written
+into out_dir.
 
 
 3. How to do it in practice?
