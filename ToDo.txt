@@ -11,6 +11,7 @@ useful_files:
  Is BAM:0113 equal mass (m0=1.504) and 0 spin?
 
 *why is there the empty dir DNSdata_test in test ???
+ Should it contain the expected test output???
 
 *cactus test parfile should turn on 1d- or 0d-output for
  g_ij, K_ij, rho, press, eps, vel
