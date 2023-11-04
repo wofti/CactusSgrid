@@ -1,0 +1,19 @@
+This repo contain a Cactus arrangement to interact with Sgrid
+-------------------------------------------------------------
+
+Currently it contains these thorns:
+
+BNSdata 
+-------
+This is an old thorn that reads BNS initial data by calling an Sgrid
+executable via the standard C-function system. For some reason the MPI in
+Cactus does not allow calls to system on some machines. Therefore this thorn
+is deprecated.
+
+
+DNSdata
+-------
+This thorn reads BNS initial data by calling functions from
+inside the Sgrid library. To link the Sgrid library into Cactus you need to
+use this thorn together with the thorn ExternalLibraries-SGRID found at
+https://github.com/EinsteinToolkit/ExternalLibraries-SGRID
