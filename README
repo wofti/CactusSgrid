@@ -17,3 +17,4 @@ This thorn reads BNS initial data by calling functions from
 inside the Sgrid library. To link the Sgrid library into Cactus you need to
 use this thorn together with the thorn ExternalLibraries-SGRID found at
 https://github.com/EinsteinToolkit/ExternalLibraries-SGRID
+There is more documentation about the DNSdata thorn in the DNSdata directory.
