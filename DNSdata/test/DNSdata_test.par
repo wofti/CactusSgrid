@@ -5,8 +5,8 @@ Cactus::cctk_run_title     = "DNSdata_test"
 Cactus::cctk_full_warnings = "yes"
 Cactus::highlight_warning_messages = "no"
 
-Cactus::terminate       = "time"
-Cactus::cctk_final_time = 10.0
+Cactus::terminate   = "iteration"
+Cactus::cctk_itlast = 512
 
 #------------------------------------------------------------------------------
 # Activate all necessary thorns:
@@ -373,9 +373,7 @@ IOBasic::outInfo_reductions = "maximum"
 IOBasic::outInfo_vars  = "
  Carpet::physical_time_per_hour
  HydroBase::rho
- ML_ADMConstraints::ML_Ham
  GRHydro::dens{reductions = 'sum maximum'}
- HydroBase::w_lorentz
 "
 
 IOScalar::outScalar_every      = 10 # every_coarse
@@ -389,10 +387,7 @@ IOScalar::outScalar_vars       = "
  ADMBase::curv
  HydroBase::rho
  HydroBase::vel
- HydroBase::w_lorentz
  GRHydro::dens{reductions = 'minimum maximum average norm1 norm2 sum'}
- SphericalSurface::sf_radius
- ML_ADMConstraints::ML_Ham
 "
 
 IOASCII::one_file_per_group     = "yes"
@@ -405,7 +400,6 @@ IOASCII::out0D_vars      = "
  SphericalSurface::sf_active
  SphericalSurface::sf_valid
  SphericalSurface::sf_info
- SphericalSurface::sf_radius
  SphericalSurface::sf_origin
  SphericalSurface::sf_coordinate_descriptors
  Hydro_Analysis::Hydro_Analysis_rho_max_loc
@@ -422,7 +416,6 @@ IOASCII::out1D_vars      = "
  ADMBase::shift
  ADMBase::metric
  ADMBase::curv
- ML_ADMConstraints::ML_Ham
 "
 
 CarpetIOHDF5::one_file_per_group             = "no"   # this is required by multipatch
@@ -436,13 +429,9 @@ CarpetIOHDF5::out2D_vars      = "
   CarpetReduce::weight
   Grid::coordinates
   HydroBase::rho
-#  HydroBase::vel
-#  HydroBase::eps
   ADMBase::lapse
   ADMBase::shift
   ADMBase::metric
-  ML_ADMConstraints::ML_Ham
-#  Hydro_Analysis::Hydro_Analysis_Temperature
  "
 
 IOHDF5::out3D_every = 0 # = 32*every_coarse
@@ -453,7 +442,6 @@ IOHDF5::out3D_vars  = "
  HydroBase::eps
  ADMBase::lapse
  ADMBase::shift
- ML_ADMConstraints::ML_Ham
  grid::coordinates
 "
 
