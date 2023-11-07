@@ -380,7 +380,7 @@ IOBasic::outInfo_vars  = "
  HydroBase::w_lorentz
 "
 
-IOScalar::outScalar_every      = 0 # every_coarse
+IOScalar::outScalar_every      = 10 # every_coarse
 IOScalar::all_reductions_in_one_file = "yes"
 IOScalar::one_file_per_group   = "yes"
 IOScalar::outScalar_reductions = "minimum maximum average norm1 norm2"
