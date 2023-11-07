@@ -30,7 +30,6 @@ ActiveThorns = "GenericFD NewRad"
 ActiveThorns = "ML_BSSN ML_BSSN_Helper ML_ADMConstraints"
 ActiveThorns = "Hydro_Analysis"
 ActiveThorns = "Dissipation"
-ActiveThorns = "SystemStatistics SystemTopology"
 ActiveThorns = "DNSdata"
 
 #------------------------------------------------------------------------------
@@ -375,7 +374,6 @@ IOBasic::outInfo_vars  = "
  Carpet::physical_time_per_hour
  HydroBase::rho
  ML_ADMConstraints::ML_Ham
- SystemStatistics::maxrss_mb
  GRHydro::dens{reductions = 'sum maximum'}
  HydroBase::w_lorentz
 "
@@ -393,7 +391,6 @@ IOScalar::outScalar_vars       = "
  HydroBase::vel
  HydroBase::w_lorentz
  GRHydro::dens{reductions = 'minimum maximum average norm1 norm2 sum'}
- SystemStatistics::process_memory_mb
  SphericalSurface::sf_radius
  ML_ADMConstraints::ML_Ham
 "
