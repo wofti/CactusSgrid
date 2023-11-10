@@ -13,7 +13,8 @@ Neutron Stars (BNS) as a starting point for the Cactus simulation.
 2. How does it work?
 
 SGRID is a separate numerical code that can create ID for BNS. In order to
-create ID flies, SGRID has to be compiled and run separately from Cactus.
+create ID flies, SGRID has to be compiled and run separately from Cactus
+(see https://github.com/sgridsource/sgrid).
 SGRID then writes ID files in its own format. In order to make SGRID's ID
 usable for Cactus, it is necessary to provide this data on the grid points
 used by Cactus. This is achieved by interpolating data from SGRID's grid
