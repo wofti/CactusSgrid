@@ -15,6 +15,7 @@ int DNS_call_sgrid(const char *command);
 int libsgrid_main(int argc, char **argv);
 extern int SGRID_memory_persists;
 int SGRID_grid_exists(void);
+void SGRID_free_everything(void);
 
 void SGRID_errorexits(char *file, int line, char *s, char *t);
 #define SGRID_errorexits(s,t) SGRID_errorexits(__FILE__, __LINE__, (s), (t))
