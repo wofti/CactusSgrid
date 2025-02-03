@@ -30,6 +30,10 @@ The DNSdata thorn is this "intermediate step". Currently data transfer
 between Cactus and the SGRID library is achieved via files that are written
 into out_dir.
 
+To link the Sgrid library into Cactus you need to
+use this thorn together with the thorn ExternalLibraries-SGRID found at
+https://github.com/EinsteinToolkit/ExternalLibraries-SGRID
+
 
 3. How to do it in practice?
 
