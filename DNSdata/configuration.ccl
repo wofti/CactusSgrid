@@ -1,3 +1,3 @@
 # Configuration definition for thorn DNSdata
 
-REQUIRES MPI
+REQUIRES MPI SGRID
